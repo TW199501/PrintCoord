@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 252 20% 97%;
+  --foreground: 230 35% 15%;
+  --muted: 252 19% 93%;
+  --muted-foreground: 230 15% 42%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 230 35% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 230 35% 15%;
+  --border: 230 20% 88%;
+  --input: 230 20% 88%;
+  --primary: 222 89% 56%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 230 18% 90%;
+  --secondary-foreground: 230 35% 20%;
+  --accent: 220 90% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 85% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 222 89% 56%;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: 230 25% 8%;
+  --foreground: 220 14% 95%;
+  --muted: 230 15% 14%;
+  --muted-foreground: 220 12% 75%;
+  --popover: 230 29% 10%;
+  --popover-foreground: 220 14% 95%;
+  --card: 230 29% 10%;
+  --card-foreground: 220 14% 95%;
+  --border: 230 18% 25%;
+  --input: 230 18% 25%;
+  --primary: 216 92% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 230 22% 18%;
+  --secondary-foreground: 220 14% 95%;
+  --accent: 216 92% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 216 92% 60%;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply min-h-screen bg-background font-sans text-foreground antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-semibold text-foreground;
+}
