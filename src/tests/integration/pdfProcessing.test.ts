@@ -55,22 +55,11 @@ describe("FileProcessingService - PDF Processing Tests", () => {
     // 清除所有 mock
     jest.clearAllMocks();
 
-    // 設置 window 環境
-    delete (global as any).window.__pdfjsLibPromise__;
-    delete (global as any).window.pdfjsLib;
-
-    // Mock getDocument
-    const mockGetDocument = jest.fn().mockReturnValue({
+    // 直接針對被導入的 pdfjs 模組設定回傳
+    const pdfjs = require("pdfjs-dist/build/pdf.mjs");
+    pdfjs.getDocument.mockReturnValue({
       promise: Promise.resolve(mockPdfDoc),
     });
-
-    (global as any).window.pdfjsLib = {
-      getDocument: mockGetDocument,
-      GlobalWorkerOptions: {
-        workerSrc: "",
-        workerPort: null,
-      },
-    };
   });
 
   describe("processFile", () => {
@@ -149,11 +138,10 @@ describe("FileProcessingService - PDF Processing Tests", () => {
 
     it("應該處理 PDF 解析錯誤", async () => {
       // 模擬 PDF 解析失敗
-      const mockGetDocumentError = jest.fn().mockReturnValue({
+      const pdfjs = require("pdfjs-dist/build/pdf.mjs");
+      pdfjs.getDocument.mockReturnValueOnce({
         promise: Promise.reject(new Error("Invalid PDF")),
       });
-
-      (global as any).window.pdfjsLib.getDocument = mockGetDocumentError;
 
       const mockFile = new File(["invalid content"], "invalid.pdf", {
         type: "application/pdf",
