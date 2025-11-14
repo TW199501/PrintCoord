@@ -16,6 +16,12 @@ const nextConfig = {
         tls: false,
       };
     }
+
+    // 確保 ?url 匯入作為靜態資源處理（供 pdfjs worker 等使用）
+    config.module.rules.push({
+      resourceQuery: /url/,
+      type: "asset/resource",
+    });
     return config;
   },
 };
