@@ -1,35 +1,18 @@
 import * as pdfjs from "pdfjs-dist/build/pdf.mjs";
-// Use bundled worker asset URL to avoid network fetching issues in production
-// Next/Webpack will turn this into a static URL
-import pdfWorkerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { FileUploadResult, PdfPage } from "@/types";
 
-// 在瀏覽器端指定 worker 路徑（改為走內部 API，避免跨網域載入失敗）
+// 在瀏覽器端使用 CDN worker 作為可靠後備（避免 SSR/bundler 相容性問題）
 if (typeof window !== "undefined") {
-  (
-    pdfjs as typeof pdfjs & { GlobalWorkerOptions: any }
-  ).GlobalWorkerOptions.workerSrc = pdfWorkerSrc as unknown as string;
+  const gwo = (pdfjs as typeof pdfjs & { GlobalWorkerOptions: any })
+    .GlobalWorkerOptions;
+  // 使用 unpkg CDN 提供的 worker（與 pdfjs-dist 版本一致）
+  gwo.workerSrc = `https://unpkg.com/pdfjs-dist@5.4.394/build/pdf.worker.min.mjs`;
 }
 
 export class FileProcessingService {
   static async processPdf(file: File): Promise<PdfPage[]> {
     const arrayBuffer = await file.arrayBuffer();
-    // 防禦性設定：若有舊版 bundle 曾把 worker 指到 /api/pdf-worker，於此再覆寫一次
-    try {
-      const gwo = (pdfjs as typeof pdfjs & { GlobalWorkerOptions: any })
-        .GlobalWorkerOptions;
-      if (
-        gwo &&
-        typeof gwo.workerSrc === "string" &&
-        gwo.workerSrc.includes("/api/pdf-worker")
-      ) {
-        gwo.workerSrc = pdfWorkerSrc as unknown as string;
-        // 方便實際頁面檢查當前 workerSrc
-        if (typeof window !== "undefined") {
-          console.info("[pdfjs] workerSrc reset at runtime:", gwo.workerSrc);
-        }
-      }
-    } catch {}
+    // 防禦性檢查已移除（現在統一使用 CDN worker）
     // pdfjs typings expect PDFDocumentLoadingParams with a data field
     const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
     const pages: PdfPage[] = [];
