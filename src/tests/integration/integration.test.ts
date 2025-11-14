@@ -1,5 +1,8 @@
 // PrintCoord - 整合測試
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { FileProcessingService } from "@/services/fileProcessingService";
 import { FieldDetectionService } from "@/services/fieldDetection";
 import { SmartSuggestionsService } from "@/services/smartSuggestions";

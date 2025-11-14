@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   FileUploadResult,
   FieldArea,
@@ -18,7 +17,6 @@ import { SmartSuggestionsService } from "@/services/smartSuggestions";
 import { UserBehaviorTracker } from "@/services/userBehaviorTracker";
 import { FieldDetectionService } from "@/services/fieldDetection";
 import { OCRService } from "@/services/ocrService";
-import { FileProcessingService } from "@/services/fileProcessingService";
 
 type WorkflowStep = "upload" | "edit" | "preview";
 
@@ -35,14 +33,6 @@ const LANGUAGES = [
   { value: "ja-JP", label: "日本語" },
   { value: "de-DE", label: "Deutsch" },
 ];
-
-const formatFileSize = (size?: number) => {
-  if (!size) {
-    return "—";
-  }
-
-  return `${(size / 1024 / 1024).toFixed(2)} MB`;
-};
 
 export default function TemplateManager() {
   const [currentStep, setCurrentStep] = useState<WorkflowStep>("upload");
@@ -291,7 +281,6 @@ export default function TemplateManager() {
       if (!bestLabel) {
         for (const w of mergedWords) {
           const wx = w.bbox[0];
-          const ww = w.bbox[2];
           const wy = w.bbox[1];
           const wh = w.bbox[3];
           const wCenterY = wy + wh / 2;
@@ -548,7 +537,6 @@ export default function TemplateManager() {
 
   const stepDetails = STEP_COPY[currentStep];
   const hasFile = Boolean(uploadResult?.file);
-  const isBatchMode = activeTab === "batch";
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">

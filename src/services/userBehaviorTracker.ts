@@ -1,11 +1,18 @@
-import { FieldType, BehaviorExportData, UserAction, FieldChoiceRecord, BehaviorPattern } from '../types';
-import { SmartSuggestionsService } from './smartSuggestions';
+import {
+  FieldType,
+  BehaviorExportData,
+  UserAction,
+  FieldChoiceRecord,
+  BehaviorPattern,
+} from "../types";
+
+import { SmartSuggestionsService } from "./smartSuggestions";
 
 export class UserBehaviorTracker {
   private static actions: UserAction[] = [];
   private static fieldChoices: FieldChoiceRecord[] = [];
-  private static readonly ACTIONS_KEY = 'tableTemplate_userActions';
-  private static readonly CHOICES_KEY = 'tableTemplate_fieldChoices';
+  private static readonly ACTIONS_KEY = "tableTemplate_userActions";
+  private static readonly CHOICES_KEY = "tableTemplate_fieldChoices";
 
   /**
    * 初始化追蹤器
@@ -33,7 +40,7 @@ export class UserBehaviorTracker {
       chosenType,
       accepted,
       confidence: 0, // 會在記錄到智慧建議服務時更新
-      responseTime
+      responseTime,
     };
 
     this.fieldChoices.push(record);
@@ -44,7 +51,12 @@ export class UserBehaviorTracker {
     }
 
     // 記錄到智慧建議服務進行學習
-    SmartSuggestionsService.recordUserChoice(text, context, chosenType, accepted);
+    SmartSuggestionsService.recordUserChoice(
+      text,
+      context,
+      chosenType,
+      accepted
+    );
 
     this.saveStoredData();
   }
@@ -56,7 +68,7 @@ export class UserBehaviorTracker {
     const userAction: UserAction = {
       action,
       timestamp: new Date(),
-      data
+      data,
     };
 
     this.actions.push(userAction);
@@ -79,11 +91,11 @@ export class UserBehaviorTracker {
         [FieldType.NUMBER]: 0,
         [FieldType.DATE]: 0,
         [FieldType.SELECT]: 0,
-        [FieldType.CHECKBOX]: 0
+        [FieldType.CHECKBOX]: 0,
       },
       acceptanceRate: 0,
       averageResponseTime: 0,
-      commonCorrections: []
+      commonCorrections: [],
     };
 
     if (this.fieldChoices.length === 0) {
@@ -91,43 +103,47 @@ export class UserBehaviorTracker {
     }
 
     // 計算偏好欄位類型
-    this.fieldChoices.forEach(choice => {
+    this.fieldChoices.forEach((choice) => {
       pattern.preferredFieldTypes[choice.chosenType]++;
     });
 
     // 正規化偏好分數
     const totalChoices = this.fieldChoices.length;
-    Object.keys(pattern.preferredFieldTypes).forEach(key => {
+    Object.keys(pattern.preferredFieldTypes).forEach((key) => {
       pattern.preferredFieldTypes[key as FieldType] /= totalChoices;
     });
 
     // 計算接受率
-    const acceptedChoices = this.fieldChoices.filter(choice => choice.accepted).length;
+    const acceptedChoices = this.fieldChoices.filter(
+      (choice) => choice.accepted
+    ).length;
     pattern.acceptanceRate = acceptedChoices / totalChoices;
 
     // 計算平均響應時間
     const validResponseTimes = this.fieldChoices
-      .filter(choice => choice.responseTime > 0)
-      .map(choice => choice.responseTime);
+      .filter((choice) => choice.responseTime > 0)
+      .map((choice) => choice.responseTime);
 
     if (validResponseTimes.length > 0) {
-      pattern.averageResponseTime = validResponseTimes.reduce((sum, time) => sum + time, 0) / validResponseTimes.length;
+      pattern.averageResponseTime =
+        validResponseTimes.reduce((sum, time) => sum + time, 0) /
+        validResponseTimes.length;
     }
 
     // 分析常見修正
     const corrections: Record<string, number> = {};
     this.fieldChoices
-      .filter(choice => !choice.accepted)
-      .forEach(choice => {
+      .filter((choice) => !choice.accepted)
+      .forEach((choice) => {
         const key = `${choice.suggestedType}->${choice.chosenType}`;
         corrections[key] = (corrections[key] || 0) + 1;
       });
 
     pattern.commonCorrections = Object.entries(corrections)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([key, frequency]) => {
-        const [fromType, toType] = key.split('->') as [FieldType, FieldType];
+        const [fromType, toType] = key.split("->") as [FieldType, FieldType];
         return { fromType, toType, frequency };
       });
 
@@ -142,12 +158,12 @@ export class UserBehaviorTracker {
     showAlternatives: boolean; // 是否顯示替代建議
     learningEnabled: boolean; // 是否啟用學習功能
   } {
-    const stored = localStorage.getItem('tableTemplate_userPreferences');
+    const stored = localStorage.getItem("tableTemplate_userPreferences");
     if (stored) {
       try {
         return JSON.parse(stored);
       } catch (error) {
-        console.warn('Failed to load user preferences:', error);
+        console.warn("Failed to load user preferences:", error);
       }
     }
 
@@ -155,25 +171,30 @@ export class UserBehaviorTracker {
     return {
       autoAcceptHighConfidence: false,
       showAlternatives: true,
-      learningEnabled: true
+      learningEnabled: true,
     };
   }
 
   /**
    * 更新用戶偏好設定
    */
-  static updateUserPreferences(preferences: Partial<{
-    autoAcceptHighConfidence: boolean;
-    showAlternatives: boolean;
-    learningEnabled: boolean;
-  }>): void {
+  static updateUserPreferences(
+    preferences: Partial<{
+      autoAcceptHighConfidence: boolean;
+      showAlternatives: boolean;
+      learningEnabled: boolean;
+    }>
+  ): void {
     const current = this.getUserPreferences();
     const updated = { ...current, ...preferences };
 
     try {
-      localStorage.setItem('tableTemplate_userPreferences', JSON.stringify(updated));
+      localStorage.setItem(
+        "tableTemplate_userPreferences",
+        JSON.stringify(updated)
+      );
     } catch (error) {
-      console.warn('Failed to save user preferences:', error);
+      console.warn("Failed to save user preferences:", error);
     }
   }
 
@@ -187,37 +208,45 @@ export class UserBehaviorTracker {
     mostUsedFieldType: FieldType;
     lastActivity: Date | null;
   } {
-    const sessions = this.actions.filter(action => action.action === 'session_start').length;
-    const lastActivity = this.actions.length > 0
-      ? this.actions[this.actions.length - 1].timestamp
-      : null;
+    const sessions = this.actions.filter(
+      (action) => action.action === "session_start"
+    ).length;
+    const lastActivity =
+      this.actions.length > 0
+        ? this.actions[this.actions.length - 1].timestamp
+        : null;
 
     // 估算平均會話時間（基於操作間隔）
     let averageSessionTime = 0;
     if (this.actions.length > 1) {
       const timeSpans = [];
       for (let i = 1; i < this.actions.length; i++) {
-        const timeDiff = this.actions[i].timestamp.getTime() - this.actions[i - 1].timestamp.getTime();
-        if (timeDiff < 30 * 60 * 1000) { // 30分鐘內的操作視為同一會話
+        const timeDiff =
+          this.actions[i].timestamp.getTime() -
+          this.actions[i - 1].timestamp.getTime();
+        if (timeDiff < 30 * 60 * 1000) {
+          // 30分鐘內的操作視為同一會話
           timeSpans.push(timeDiff);
         }
       }
       if (timeSpans.length > 0) {
-        averageSessionTime = timeSpans.reduce((sum, time) => sum + time, 0) / timeSpans.length;
+        averageSessionTime =
+          timeSpans.reduce((sum, time) => sum + time, 0) / timeSpans.length;
       }
     }
 
     // 最常用的欄位類型
     const patterns = this.analyzeBehaviorPatterns();
-    const mostUsedType = Object.entries(patterns.preferredFieldTypes)
-      .sort(([,a], [,b]) => b - a)[0][0] as FieldType;
+    const mostUsedType = Object.entries(patterns.preferredFieldTypes).sort(
+      ([, a], [, b]) => b - a
+    )[0][0] as FieldType;
 
     return {
       totalSessions: sessions,
       totalFieldChoices: this.fieldChoices.length,
       averageSessionTime,
       mostUsedFieldType: mostUsedType,
-      lastActivity
+      lastActivity,
     };
   }
 
@@ -229,7 +258,7 @@ export class UserBehaviorTracker {
       actions: [...this.actions],
       fieldChoices: [...this.fieldChoices],
       patterns: this.analyzeBehaviorPatterns(),
-      stats: this.getUsageStats()
+      stats: this.getUsageStats(),
     };
   }
 
@@ -252,10 +281,10 @@ export class UserBehaviorTracker {
       try {
         this.actions = JSON.parse(actionsData).map((action: any) => ({
           ...action,
-          timestamp: new Date(action.timestamp)
+          timestamp: new Date(action.timestamp),
         }));
       } catch (error) {
-        console.warn('Failed to load actions data:', error);
+        console.warn("Failed to load actions data:", error);
         this.actions = [];
       }
     }
@@ -266,7 +295,7 @@ export class UserBehaviorTracker {
       try {
         this.fieldChoices = JSON.parse(choicesData);
       } catch (error) {
-        console.warn('Failed to load field choices data:', error);
+        console.warn("Failed to load field choices data:", error);
         this.fieldChoices = [];
       }
     }
@@ -280,7 +309,7 @@ export class UserBehaviorTracker {
       localStorage.setItem(this.ACTIONS_KEY, JSON.stringify(this.actions));
       localStorage.setItem(this.CHOICES_KEY, JSON.stringify(this.fieldChoices));
     } catch (error) {
-      console.warn('Failed to save behavior data:', error);
+      console.warn("Failed to save behavior data:", error);
     }
   }
 }

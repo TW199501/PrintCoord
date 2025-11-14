@@ -1,6 +1,8 @@
 // PDF2JSON 使用示例
 // 展示如何使用 PDF2JSONService 和 PDFDatabaseService
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import fs from "fs";
 import path from "path";
 import { PDF2JSONService } from "@/services/pdf2jsonService";

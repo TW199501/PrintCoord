@@ -1,5 +1,8 @@
 // PDF2JSONService 單元測試
 
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { PDF2JSONService } from "@/services/pdf2jsonService";
 import { FieldType } from "@/types";
 

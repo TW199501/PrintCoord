@@ -1,4 +1,8 @@
 // PDF Database Service - 管理 PDF 解析結果的數據庫操作
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import {
   PDF2JSONOutput,
   PDFDocumentRecord,

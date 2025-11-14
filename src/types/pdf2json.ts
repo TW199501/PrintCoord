@@ -15,7 +15,7 @@ export interface PDF2JSONMeta {
   Producer?: string;
   CreationDate?: string;
   ModDate?: string;
-  Metadata?: Record<string, any>;
+  Metadata?: Record<string, unknown>;
 }
 
 /**
@@ -72,7 +72,7 @@ export interface PDF2JSONField {
   style?: number;
   T?: {
     Name: string;
-    TypeInfo?: Record<string, any>;
+    TypeInfo?: Record<string, unknown>;
   };
   id?: {
     Id: string;
@@ -93,7 +93,7 @@ export interface PDF2JSONPage {
   Fills: PDF2JSONFill[];
   Texts: PDF2JSONText[];
   Fields?: PDF2JSONField[];
-  Boxsets?: any[];
+  Boxsets?: Array<Record<string, unknown>>;
 }
 
 /**

@@ -1,13 +1,11 @@
 // PrintCoord - 文件處理服務
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import mammoth from "mammoth";
 import * as pdfjsLib from "pdfjs-dist";
-import {
-  FileType,
-  ProcessedTemplate,
-  TemplateConfig,
-  FileUploadResult,
-} from "../types";
+import { FileType, FileUploadResult } from "../types";
 
 type PdfViewport = {
   width: number;

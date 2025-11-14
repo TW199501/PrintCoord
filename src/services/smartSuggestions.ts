@@ -1,5 +1,7 @@
 // PrintCoord - 智慧建議服務
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { FieldType, SuggestionResult } from "../types";
 
 // 學習記錄介面
@@ -11,7 +13,8 @@ interface LearningRecord {
   timestamp: Date;
 }
 
-// 模式分析結果
+// 模式分析結果 (未使用但保留供未來擴展)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface PatternAnalysis {
   commonPatterns: Array<{
     pattern: string;

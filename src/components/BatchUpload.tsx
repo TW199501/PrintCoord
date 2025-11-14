@@ -9,14 +9,12 @@ import { BatchProcessItem } from "../types";
 import { BatchProcessorService } from "../services/batchProcessor";
 import {
   Upload,
-  FileText,
   CheckCircle,
   XCircle,
   Clock,
   Download,
   Trash2,
   Play,
-  Pause,
   Square,
 } from "lucide-react";
 

@@ -3,18 +3,8 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import * as fabric from "fabric";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FieldArea, FieldType } from "../types";
-import { Sparkles } from "lucide-react";
-import FieldSuggestions from "./FieldSuggestions";
 
 interface TemplateEditorProps {
   canvasData?: string; // Base64 encoded image
@@ -31,7 +21,6 @@ export default function TemplateEditor({
 }: TemplateEditorProps): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
-  const [selectedField, setSelectedField] = useState<FieldArea | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
   // 初始化 Canvas
@@ -124,17 +113,7 @@ export default function TemplateEditor({
       canvas.add(text);
     });
 
-    // 選擇事件
-    canvas.on("selection:created", (e: any) => {
-      const selected = e.selected?.[0];
-      if (selected && selected.data) {
-        setSelectedField(selected.data);
-      }
-    });
-
-    canvas.on("selection:cleared", () => {
-      setSelectedField(null);
-    });
+    // 選擇事件（欄位編輯現在在右側 DraggableFieldList 中處理）
 
     if (onCanvasReady) {
       onCanvasReady(canvas);
@@ -156,7 +135,7 @@ export default function TemplateEditor({
     let startY = 0;
     let rect: fabric.Rect | null = null;
 
-    const handleMouseDown = (e: any) => {
+    const handleMouseDown = (e: fabric.TPointerEventInfo) => {
       if (!e.pointer) return;
 
       startX = e.pointer.x;
@@ -176,7 +155,7 @@ export default function TemplateEditor({
       canvas.add(rect);
     };
 
-    const handleMouseMove = (e: any) => {
+    const handleMouseMove = (e: fabric.TPointerEventInfo) => {
       if (!rect || !e.pointer) return;
 
       const width = e.pointer.x - startX;
@@ -227,8 +206,9 @@ export default function TemplateEditor({
 
     // 清除所有欄位物件（保留背景圖）
     const objects = canvas.getObjects();
-    objects.forEach((obj: any) => {
-      if (obj.data || obj.type === 'rect' || obj.type === 'text') {
+    objects.forEach((obj) => {
+      const objWithData = obj as fabric.FabricObject & { data?: FieldArea };
+      if (objWithData.data || obj.type === 'rect' || obj.type === 'text') {
         canvas.remove(obj);
       }
     });
@@ -264,20 +244,7 @@ export default function TemplateEditor({
     canvas.renderAll();
   }, [fields]);
 
-  // 更新欄位
-  const updateField = (fieldId: string, updates: Partial<FieldArea>) => {
-    const updatedFields = fields.map((field) =>
-      field.id === fieldId ? { ...field, ...updates } : field,
-    );
-    onFieldsChange(updatedFields);
-  };
-
-  // 刪除欄位
-  const deleteField = (fieldId: string) => {
-    const updatedFields = fields.filter((field) => field.id !== fieldId);
-    onFieldsChange(updatedFields);
-    setSelectedField(null);
-  };
+  // 欄位編輯功能已移至 DraggableFieldList 組件
 
   return (
     <div>

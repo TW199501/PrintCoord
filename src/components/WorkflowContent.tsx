@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Globe, Loader2, ScanLine, Upload as UploadIcon } from "lucide-react";
-import { FileUploadResult, FieldArea, TemplateConfig } from "@/types";
+import { FileUploadResult, FieldArea, TemplateConfig, BatchProcessItem } from "@/types";
 import FileUpload from "@/components/FileUpload";
 import DraggableFieldList from "@/components/DraggableFieldList";
 
@@ -36,7 +36,7 @@ interface WorkflowContentProps {
   onFileProcessed: (result: FileUploadResult) => void;
   onFieldsChange: (fields: FieldArea[]) => void;
   onTemplateConfigChange: (config: Partial<TemplateConfig>) => void;
-  onBatchComplete: (results: any[]) => void;
+  onBatchComplete: (results: BatchProcessItem[]) => void;
 }
 
 export default function WorkflowContent({
@@ -151,6 +151,7 @@ export default function WorkflowContent({
                           </span>
                         </div>
                         <div className="p-2">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={page.dataUrl}
                             alt={`PDF 第 ${index + 1} 頁`}

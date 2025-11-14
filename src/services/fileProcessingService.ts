@@ -3,8 +3,9 @@ import { FileUploadResult, PdfPage } from "@/types";
 
 // 在瀏覽器端使用 CDN worker 作為可靠後備（避免 SSR/bundler 相容性問題）
 if (typeof window !== "undefined") {
-  const gwo = (pdfjs as typeof pdfjs & { GlobalWorkerOptions: any })
-    .GlobalWorkerOptions;
+  const gwo = (
+    pdfjs as typeof pdfjs & { GlobalWorkerOptions: { workerSrc: string } }
+  ).GlobalWorkerOptions;
   // 使用 unpkg CDN 提供的 worker（與 pdfjs-dist 版本一致）
   gwo.workerSrc = `https://unpkg.com/pdfjs-dist@5.4.394/build/pdf.worker.min.mjs`;
 }
@@ -27,7 +28,10 @@ export class FileProcessingService {
 
       if (context) {
         // RenderParameters only requires canvasContext and viewport
-        await page.render({ canvasContext: context as any, viewport }).promise;
+        await page.render({
+          canvasContext: context as unknown as CanvasRenderingContext2D,
+          viewport,
+        }).promise;
         pages.push({
           pageNumber: i,
           canvas: canvas,

@@ -1,10 +1,10 @@
 // PrintCoord - 批量處理服務
 
 import {
-  FileUploadResult,
   BatchProcessItem,
   TemplateConfig,
-  FieldArea,
+  OCRResult,
+  FileType,
 } from "../types";
 import { FileProcessingService } from "./fileProcessingService";
 import { FieldDetectionService } from "./fieldDetection";
@@ -26,7 +26,7 @@ export class BatchProcessorService {
     ) => void,
     onItemComplete?: (item: BatchProcessItem) => void
   ): Promise<BatchProcessItem[]> {
-    const items: BatchProcessItem[] = files.map((file) => ({
+    const items: BatchProcessItem[] = files.map(() => ({
       id: `batch_${Date.now()}_${Math.random()}`,
       templateId: "",
       data: {},
@@ -110,7 +110,8 @@ export class BatchProcessorService {
         name: file.name.replace(/\.[^/.]+$/, ""), // 移除副檔名
         description: `從 ${file.name} 自動生成的模板`,
         originalFileName: file.name,
-        fileType: file.name.split(".").pop()?.toLowerCase() as any,
+        fileType: (file.name.split(".").pop()?.toLowerCase() ||
+          "unknown") as FileType,
         createdAt: new Date(),
         updatedAt: new Date(),
         fields: [],
@@ -118,7 +119,11 @@ export class BatchProcessorService {
 
       // 3. 如果是圖片文件，進行 OCR 處理
       if (file.type.startsWith("image/") || fileResult.pdfPages) {
-        let ocrResults: any[] = [];
+        let ocrResults: Array<{
+          words: OCRResult[];
+          lines: OCRResult[];
+          blocks: OCRResult[];
+        }> = [];
 
         if (fileResult.pdfPages && fileResult.pdfPages.length > 0) {
           // PDF 文件：處理每一頁
@@ -161,7 +166,11 @@ export class BatchProcessorService {
               acc.blocks.push(...layout.blocks);
               return acc;
             },
-            { words: [], lines: [], blocks: [] }
+            {
+              words: [] as OCRResult[],
+              lines: [] as OCRResult[],
+              blocks: [] as OCRResult[],
+            }
           );
 
           const imageWidth = fileResult.pdfPages?.[0]?.canvas.width || 800;
@@ -196,14 +205,14 @@ export class BatchProcessorService {
    */
   static async generateBatchFiles(
     templates: TemplateConfig[],
-    data: Array<Record<string, any>>,
+    data: Array<Record<string, unknown>>,
     onProgress?: (completed: number, total: number) => void
   ): Promise<Array<{ success: boolean; data?: Blob; error?: string }>> {
     const results = [];
     let completed = 0;
 
-    for (const template of templates) {
-      for (const itemData of data) {
+    for (let i = 0; i < templates.length; i++) {
+      for (let j = 0; j < data.length; j++) {
         try {
           // 這裡可以整合 PDF 生成邏輯
           // 目前返回模擬結果

@@ -1,5 +1,8 @@
 // PrintCoord - OCR 服務單元測試
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { OCRService } from "@/services/ocrService";
 import { OCRResult } from "@/types";
 

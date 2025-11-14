@@ -1,7 +1,9 @@
 // PrintCoord - OCR 服務
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { createWorker, Worker, PSM } from "tesseract.js";
-import { OCRResult, Position } from "../types";
+import { OCRResult } from "../types";
 
 export class OCRService {
   private static worker: Worker | null = null;

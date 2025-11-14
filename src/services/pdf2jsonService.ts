@@ -1,4 +1,8 @@
 // PDF2JSON Service - PDF table extraction using pdf2json library
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import PDFParser from "pdf2json";
 import { FieldArea, FieldType } from "@/types";
 import type {
@@ -6,7 +10,6 @@ import type {
   PDF2JSONPage,
   PDF2JSONText,
   PDF2JSONFill,
-  PDF2JSONLine,
 } from "@/types/pdf2json";
 
 export class PDF2JSONService {

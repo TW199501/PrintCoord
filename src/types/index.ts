@@ -55,7 +55,7 @@ export enum FileType {
 }
 
 export interface TemplateData {
-  [fieldId: string]: any;
+  [fieldId: string]: string | number | boolean | null | undefined;
 }
 
 export interface ProcessedTemplate {
@@ -76,7 +76,7 @@ export interface FileUploadResult {
   file?: File;
   error?: string;
   html?: string; // DOCX 轉換後的 HTML
-  messages?: any[]; // Mammoth 轉換消息
+  messages?: Array<{ type: string; message: string }>; // Mammoth 轉換消息
   pdfPages?: PdfPage[]; // PDF 頁面數據
 }
 
@@ -156,7 +156,7 @@ export interface BehaviorExportData {
 export interface UserAction {
   action: string;
   timestamp: Date;
-  data: any;
+  data: Record<string, unknown>;
 }
 
 // 欄位選擇記錄

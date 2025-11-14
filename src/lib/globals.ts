@@ -1,19 +1,22 @@
 // Global polyfills for server-side rendering
 // 為伺服器端渲染添加全域 polyfills
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // 確保 DOMMatrix 在全域可用
 if (
   typeof global !== "undefined" &&
   typeof (global as any).DOMMatrix === "undefined"
 ) {
   (global as any).DOMMatrix = class DOMMatrix {
-    constructor(transform?: string | number[]) {
+    constructor(_transform?: string | number[]) {
       // 簡單的模擬實現
     }
-    static fromFloat32Array(array: Float32Array): DOMMatrix {
+    static fromFloat32Array(_array: Float32Array): DOMMatrix {
       return new DOMMatrix();
     }
-    multiply(other: DOMMatrix): DOMMatrix {
+    multiply(_other: DOMMatrix): DOMMatrix {
       return this;
     }
   };

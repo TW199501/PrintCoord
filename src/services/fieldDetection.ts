@@ -1,5 +1,7 @@
 // PrintCoord - 欄位檢測服務
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { OCRResult, FieldArea, FieldType } from "../types";
 import { OCRService } from "./ocrService";
 
@@ -8,9 +10,9 @@ export class FieldDetectionService {
    * 從 OCR 結果中檢測可能的欄位
    */
   static async detectFieldsFromLayout(
-    layoutData: { words: OCRResult[]; lines: any[]; blocks: any[] },
+    layoutData: { words: OCRResult[]; lines: OCRResult[]; blocks: OCRResult[] },
     imageWidth: number,
-    imageHeight: number
+    _imageHeight: number
   ): Promise<FieldArea[]> {
     const { words, lines } = layoutData;
 

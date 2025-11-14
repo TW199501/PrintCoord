@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
-import { Upload, FileText, X, CheckCircle } from "lucide-react";
+import { Upload, X, CheckCircle } from "lucide-react";
 import { FileUploadResult } from "../types";
 import { FileProcessingService } from "@/services/fileProcessingService";
 

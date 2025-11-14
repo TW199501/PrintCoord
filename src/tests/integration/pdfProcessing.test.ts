@@ -2,6 +2,9 @@
  * PDF 處理功能整合測試
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { FileProcessingService } from "../../services/fileProcessingService";
 
 // Mock PDF.js

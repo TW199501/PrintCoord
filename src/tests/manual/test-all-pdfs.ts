@@ -1,4 +1,7 @@
 // Test all PDFs with the new pdf2json service
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import fs from "fs";
 import path from "path";
 import { PDF2JSONService } from "./src/services/pdf2jsonService";
