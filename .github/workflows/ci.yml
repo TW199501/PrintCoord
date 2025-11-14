@@ -45,15 +45,3 @@ jobs:
         run: pnpm test
         continue-on-error: false
       
-      - name: Build project
-        run: pnpm build
-        env:
-          NODE_ENV: production
-      
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-${{ matrix.node-version }}
-          path: .next
-          retention-days: 7

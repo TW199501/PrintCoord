@@ -49,9 +49,9 @@ describe("Integration Tests", () => {
           { text: "發票金額", confidence: 85, bbox: [10, 50, 80, 20] },
         ] as OCRResult[],
         lines: [
-          { bbox: { x0: 5, y0: 5, x1: 200, y1: 6 } },
-          { bbox: { x0: 5, y0: 45, x1: 200, y1: 46 } },
-        ],
+          { text: "", confidence: 100, bbox: [5, 5, 195, 1] },
+          { text: "", confidence: 100, bbox: [5, 45, 195, 1] },
+        ] as OCRResult[],
         blocks: [],
       };
 

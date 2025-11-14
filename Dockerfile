@@ -14,6 +14,7 @@ WORKDIR /app
 
 # 複製依賴文件
 COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # 安裝生產依賴
 RUN pnpm install --frozen-lockfile --prod=false
