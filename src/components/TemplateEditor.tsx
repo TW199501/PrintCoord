@@ -237,177 +237,29 @@ export default function TemplateEditor({
   };
 
   return (
-    <div className="flex gap-6">
-      {/* Canvas 區域 */}
-      <div className="flex-1">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              模板編輯器
-              <Button onClick={addField} disabled={isDrawing}>
-                {isDrawing ? "繪製中..." : "添加欄位"}
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="border rounded-lg overflow-hidden">
-              <canvas
-                ref={canvasRef}
-                className="block"
-                style={{ maxWidth: "100%", height: "auto" }}
-              />
-            </div>
-            {isDrawing && (
-              <p className="text-sm text-blue-600 mt-2">拖拽鼠標繪製欄位區域</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* 欄位屬性面板 */}
-      <div className="w-80">
-        <Card>
-          <CardHeader>
-            <CardTitle>欄位屬性</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {selectedField ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    欄位名稱
-                  </label>
-                  <Input
-                    value={selectedField.name}
-                    onChange={(e) =>
-                      updateField(selectedField.id, { name: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    欄位類型
-                  </label>
-                  <Select
-                    value={selectedField.fieldType}
-                    onValueChange={(value: FieldType) =>
-                      updateField(selectedField.id, { fieldType: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={FieldType.TEXT}>文字</SelectItem>
-                      <SelectItem value={FieldType.NUMBER}>數字</SelectItem>
-                      <SelectItem value={FieldType.DATE}>日期</SelectItem>
-                      <SelectItem value={FieldType.SELECT}>下拉選單</SelectItem>
-                      <SelectItem value={FieldType.CHECKBOX}>
-                        核取方塊
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      X 座標
-                    </label>
-                    <Input
-                      type="number"
-                      value={Math.round(selectedField.position.x)}
-                      onChange={(e) =>
-                        updateField(selectedField.id, {
-                          position: {
-                            ...selectedField.position,
-                            x: Number(e.target.value),
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Y 座標
-                    </label>
-                    <Input
-                      type="number"
-                      value={Math.round(selectedField.position.y)}
-                      onChange={(e) =>
-                        updateField(selectedField.id, {
-                          position: {
-                            ...selectedField.position,
-                            y: Number(e.target.value),
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      寬度
-                    </label>
-                    <Input
-                      type="number"
-                      value={Math.round(selectedField.size.width)}
-                      onChange={(e) =>
-                        updateField(selectedField.id, {
-                          size: {
-                            ...selectedField.size,
-                            width: Number(e.target.value),
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      高度
-                    </label>
-                    <Input
-                      type="number"
-                      value={Math.round(selectedField.size.height)}
-                      onChange={(e) =>
-                        updateField(selectedField.id, {
-                          size: {
-                            ...selectedField.size,
-                            height: Number(e.target.value),
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => deleteField(selectedField.id)}
-                  className="w-full"
-                >
-                  刪除欄位
-                </Button>
-
-                {/* 智慧欄位建議 */}
-                <FieldSuggestions
-                  field={selectedField}
-                  onFieldUpdate={updateField}
-                  context={fields
-                    .filter((f) => f.id !== selectedField.id)
-                    .map((f) => f.name)}
-                />
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-8">
-                請選擇一個欄位來編輯屬性
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+    <div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            模板編輯器
+            <Button onClick={addField} disabled={isDrawing} size="sm">
+              {isDrawing ? "繪製中..." : "添加欄位"}
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="border rounded-lg overflow-hidden bg-muted/30">
+            <canvas
+              ref={canvasRef}
+              className="block"
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
+          </div>
+          {isDrawing && (
+            <p className="text-sm text-blue-600 mt-2">拖拽鼠標繪製欄位區域</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

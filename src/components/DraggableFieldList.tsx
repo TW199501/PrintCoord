@@ -86,7 +86,7 @@ export default function DraggableFieldList({
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragEnd={handleDragEnd}
-            className={`rounded-lg border bg-card transition-all ${
+            className={`rounded-md border border-border/40 bg-card/50 transition-all ${
               isDragging ? "opacity-50" : "opacity-100"
             }`}
           >
@@ -116,7 +116,7 @@ export default function DraggableFieldList({
 
             {/* 展開的編輯表單 */}
             {isExpanded && (
-              <div className="border-t bg-muted/20 px-3 py-3 space-y-3">
+              <div className="border-t border-border/30 bg-muted/10 px-3 py-3 space-y-3">
                 <div>
                   <label className="text-xs font-medium mb-1 block">
                     欄位名稱

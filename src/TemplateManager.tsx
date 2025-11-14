@@ -36,6 +36,7 @@ const TemplateEditor = dynamic(() => import("@/components/TemplateEditor"), {
 const BatchUpload = dynamic(() => import("@/components/BatchUpload"), {
   ssr: false,
 });
+import DraggableFieldList from "@/components/DraggableFieldList";
 import { SmartSuggestionsService } from "@/services/smartSuggestions";
 import { UserBehaviorTracker } from "@/services/userBehaviorTracker";
 import { FieldDetectionService } from "@/services/fieldDetection";
@@ -908,35 +909,13 @@ export default function TemplateManager() {
                       />
                     </div>
                   </div>
-                  <aside className="w-[320px] border-l bg-background px-3 py-3">
+                  <aside className="w-[320px] border-l bg-background px-3 py-3 flex flex-col h-full">
                     <div className="mb-3 text-sm font-medium">欄位清單</div>
-                    <div className="space-y-2 max-h-[45vh] overflow-y-auto pr-1 text-sm">
-                      {fields.length === 0 ? (
-                        <div className="text-xs text-muted-foreground">尚未有欄位</div>
-                      ) : (
-                        fields.map((field) => (
-                          <div
-                            key={field.id}
-                            className="flex items-start justify-between rounded-lg border border-border/60 px-3 py-2"
-                          >
-                            <div>
-                              <p className="font-medium">{field.labelZh || field.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {field.fieldType} • {Math.round(field.size.width)} × {Math.round(field.size.height)}
-                              </p>
-                            </div>
-                            <span className="text-xs text-muted-foreground">
-                              ({Math.round(field.position.x)}, {Math.round(field.position.y)})
-                            </span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                    <div className="mt-4">
-                      <div className="mb-2 text-sm font-medium">欄位屬性</div>
-                      <div className="rounded-md border p-3 text-xs text-muted-foreground">
-                        請選擇一個欄位以查看屬性
-                      </div>
+                    <div className="flex-1 overflow-y-auto pr-1 min-h-0">
+                      <DraggableFieldList
+                        fields={fields}
+                        onFieldsChange={handleFieldsChange}
+                      />
                     </div>
                   </aside>
                 </div>
