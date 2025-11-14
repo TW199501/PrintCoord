@@ -1,11 +1,14 @@
 import * as pdfjs from "pdfjs-dist/build/pdf.mjs";
+// Use bundled worker asset URL to avoid network fetching issues in production
+// Next/Webpack will turn this into a static URL
+import pdfWorkerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { FileUploadResult, PdfPage } from "@/types";
 
 // 在瀏覽器端指定 worker 路徑（改為走內部 API，避免跨網域載入失敗）
 if (typeof window !== "undefined") {
   (
     pdfjs as typeof pdfjs & { GlobalWorkerOptions: any }
-  ).GlobalWorkerOptions.workerSrc = "/api/pdf-worker";
+  ).GlobalWorkerOptions.workerSrc = pdfWorkerSrc as unknown as string;
 }
 
 export class FileProcessingService {
