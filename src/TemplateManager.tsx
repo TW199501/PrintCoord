@@ -60,6 +60,7 @@ export default function TemplateManager() {
   );
   const [language, setLanguage] = useState(LANGUAGES[0].value);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const isDarkMode = theme === "dark";
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [ocrInitializing, setOcrInitializing] = useState(true);
@@ -593,8 +594,6 @@ export default function TemplateManager() {
     </div>
   );
 }
-
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
             TT
           </div>
           <div>
