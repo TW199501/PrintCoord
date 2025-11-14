@@ -11,7 +11,8 @@ if (typeof window !== "undefined") {
 export class FileProcessingService {
   static async processPdf(file: File): Promise<PdfPage[]> {
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjs.getDocument(arrayBuffer).promise;
+    // pdfjs typings expect PDFDocumentLoadingParams with a data field
+    const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
     const pages: PdfPage[] = [];
 
     for (let i = 1; i <= pdf.numPages; i++) {
@@ -23,7 +24,8 @@ export class FileProcessingService {
       const context = canvas.getContext("2d");
 
       if (context) {
-        await page.render({ canvas, canvasContext: context, viewport }).promise;
+        // RenderParameters only requires canvasContext and viewport
+        await page.render({ canvasContext: context as any, viewport }).promise;
         pages.push({
           pageNumber: i,
           canvas: canvas,
