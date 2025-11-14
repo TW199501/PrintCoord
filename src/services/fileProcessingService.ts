@@ -14,6 +14,22 @@ if (typeof window !== "undefined") {
 export class FileProcessingService {
   static async processPdf(file: File): Promise<PdfPage[]> {
     const arrayBuffer = await file.arrayBuffer();
+    // 防禦性設定：若有舊版 bundle 曾把 worker 指到 /api/pdf-worker，於此再覆寫一次
+    try {
+      const gwo = (pdfjs as typeof pdfjs & { GlobalWorkerOptions: any })
+        .GlobalWorkerOptions;
+      if (
+        gwo &&
+        typeof gwo.workerSrc === "string" &&
+        gwo.workerSrc.includes("/api/pdf-worker")
+      ) {
+        gwo.workerSrc = pdfWorkerSrc as unknown as string;
+        // 方便實際頁面檢查當前 workerSrc
+        if (typeof window !== "undefined") {
+          console.info("[pdfjs] workerSrc reset at runtime:", gwo.workerSrc);
+        }
+      }
+    } catch {}
     // pdfjs typings expect PDFDocumentLoadingParams with a data field
     const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
     const pages: PdfPage[] = [];
