@@ -129,8 +129,9 @@ describe("FileProcessingService - PDF Processing Tests", () => {
 
       const result = await FileProcessingService.processFile(textFile);
 
-      // 根據目前的邏輯，非 PDF 文件會成功，但沒有 pdfPages
-      expect(result.success).toBe(true);
+      // 目前邏輯：非 PDF 檔案會被拒絕並回傳錯誤
+      expect(result.success).toBe(false);
+      expect(result.error).toEqual(expect.stringContaining("不支援的文件類型"));
       expect(result.pdfPages).toBeUndefined();
     });
 
