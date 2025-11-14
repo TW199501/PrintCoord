@@ -220,6 +220,49 @@ export default function TemplateEditor({
     canvas.on("mouse:up", handleMouseUp);
   }, []);
 
+  // 監聽 fields 變化，同步更新 Canvas 上的藍色框
+  useEffect(() => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas) return;
+
+    // 清除所有欄位物件（保留背景圖）
+    const objects = canvas.getObjects();
+    objects.forEach((obj: any) => {
+      if (obj.data || obj.type === 'rect' || obj.type === 'text') {
+        canvas.remove(obj);
+      }
+    });
+
+    // 重新繪製所有欄位
+    fields.forEach((field) => {
+      const rect = new fabric.Rect({
+        left: field.position.x,
+        top: field.position.y,
+        width: field.size.width,
+        height: field.size.height,
+        fill: "rgba(59, 130, 246, 0.2)",
+        stroke: "#3b82f6",
+        strokeWidth: 2,
+        selectable: true,
+        hasControls: true,
+        lockRotation: true,
+        data: field,
+      });
+
+      const text = new fabric.Text(field.labelZh || field.name, {
+        left: field.position.x + 5,
+        top: field.position.y + 5,
+        fontSize: 12,
+        fill: "#3b82f6",
+        selectable: false,
+      });
+
+      canvas.add(rect);
+      canvas.add(text);
+    });
+
+    canvas.renderAll();
+  }, [fields]);
 
   // 更新欄位
   const updateField = (fieldId: string, updates: Partial<FieldArea>) => {

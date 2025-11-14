@@ -1,26 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import {
-  Globe,
-  Loader2,
-  Moon,
-  ScanLine,
-  Sun,
-  Upload as UploadIcon,
-} from "lucide-react";
 import {
   FileUploadResult,
   FieldArea,
@@ -29,14 +10,10 @@ import {
   FileType,
   OCRResult,
 } from "@/types";
-import FileUpload from "@/components/FileUpload";
-const TemplateEditor = dynamic(() => import("@/components/TemplateEditor"), {
-  ssr: false,
-});
-const BatchUpload = dynamic(() => import("@/components/BatchUpload"), {
-  ssr: false,
-});
-import DraggableFieldList from "@/components/DraggableFieldList";
+import TemplateHeader from "@/components/TemplateHeader";
+import TemplateFooter from "@/components/TemplateFooter";
+import StepIndicator from "@/components/StepIndicator";
+import WorkflowContent from "@/components/WorkflowContent";
 import { SmartSuggestionsService } from "@/services/smartSuggestions";
 import { UserBehaviorTracker } from "@/services/userBehaviorTracker";
 import { FieldDetectionService } from "@/services/fieldDetection";
@@ -574,8 +551,49 @@ export default function TemplateManager() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="flex items-center gap-6 border-b bg-background/95 px-6 py-2 backdrop-blur">
-        <div className="flex items-center gap-4">
+      <TemplateHeader
+        language={language}
+        onLanguageChange={handleLanguageChange}
+        isDarkMode={isDarkMode}
+        onThemeToggle={handleThemeToggle}
+      />
+
+      <StepIndicator
+        currentStep={currentStep}
+        stepDetails={stepDetails}
+        isScanning={isScanning}
+        hasFile={hasFile}
+        fieldsCount={fields.length}
+        templateName={templateConfig.name ?? ""}
+        onReset={handleResetWorkflow}
+        onPrevious={handlePreviousStep}
+        onNext={handleNextStep}
+        canProceed={canProceed}
+      />
+
+      <WorkflowContent
+        currentStep={currentStep}
+        activeTab={activeTab}
+        uploadSession={uploadSession}
+        uploadResult={uploadResult}
+        scanError={scanError}
+        fields={fields}
+        templateConfig={templateConfig}
+        canvasData={canvasData}
+        ocrInitializing={ocrInitializing}
+        ocrError={ocrError}
+        onTabChange={(tab) => setActiveTab(tab)}
+        onFileProcessed={handleFileProcessed}
+        onFieldsChange={handleFieldsChange}
+        onTemplateConfigChange={setTemplateConfig}
+        onBatchComplete={handleBatchComplete}
+      />
+
+      <TemplateFooter />
+    </div>
+  );
+}
+
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
             TT
           </div>
