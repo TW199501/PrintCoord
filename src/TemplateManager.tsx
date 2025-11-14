@@ -909,9 +909,9 @@ export default function TemplateManager() {
                       />
                     </div>
                   </div>
-                  <aside className="w-[320px] border-l bg-background px-3 py-3 flex flex-col h-full">
+                  <aside className="w-[320px] border-l bg-background px-3 py-3 flex flex-col">
                     <div className="mb-3 text-sm font-medium">欄位清單</div>
-                    <div className="flex-1 overflow-y-auto pr-1 min-h-0">
+                    <div className="overflow-y-auto pr-1 rounded-lg border bg-muted/30 p-3" style={{ height: "848px" }}>
                       <DraggableFieldList
                         fields={fields}
                         onFieldsChange={handleFieldsChange}

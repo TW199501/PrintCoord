@@ -74,7 +74,7 @@ export default function DraggableFieldList({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {fields.map((field, index) => {
         const isExpanded = expandedId === field.id;
         const isDragging = draggedIndex === index;
