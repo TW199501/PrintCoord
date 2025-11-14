@@ -10,17 +10,22 @@ jest.mock("react-dropzone", () => ({
   useDropzone: jest.fn(),
 }));
 
-// Mock FileProcessingService
-jest.mock("@/services/fileProcessing", () => ({
-  FileProcessingService: {
-    processUploadedFile: jest.fn(),
-  },
-}));
+// Mock FileProcessingService（修正匯入路徑）
+jest.mock("@/services/fileProcessingService", () => {
+  const processUploadedFile = jest.fn();
+  const processFile = jest.fn((file: File) => processUploadedFile(file));
+  return {
+    FileProcessingService: {
+      processUploadedFile,
+      processFile,
+    },
+  };
+});
 
 describe("FileUpload", () => {
   const mockOnFileProcessed = jest.fn();
   const { useDropzone: mockUseDropzone } = jest.requireMock("react-dropzone");
-  const { FileProcessingService } = jest.requireMock("@/services/fileProcessing");
+  const { FileProcessingService } = jest.requireMock("@/services/fileProcessingService");
 
   beforeEach(() => {
     mockOnFileProcessed.mockClear();

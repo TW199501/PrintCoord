@@ -1,4 +1,4 @@
-import * as pdfjs from "pdfjs-dist";
+import * as pdfjs from "pdfjs-dist/build/pdf.mjs";
 import { FileUploadResult, PdfPage } from "@/types";
 
 // 在瀏覽器端指定 worker 路徑（改為走內部 API，避免跨網域載入失敗）
