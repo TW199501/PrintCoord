@@ -5,6 +5,7 @@ import * as fabric from "fabric";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FieldArea, FieldType } from "../types";
+import EditorWithRuler from "./EditorWithRuler";
 
 interface TemplateEditorProps {
   canvasData?: string; // Base64 encoded image
@@ -22,15 +23,81 @@ export default function TemplateEditor({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [hasImage, setHasImage] = useState(false);
+
+  const handlePrint = useCallback(() => {
+    if (!canvasRef.current) {
+      return;
+    }
+
+    const dataUrl = canvasRef.current.toDataURL("image/png");
+
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    iframe.style.visibility = "hidden";
+
+    document.body.appendChild(iframe);
+
+    const cleanup = () => {
+      if (iframe.parentNode) {
+        iframe.parentNode.removeChild(iframe);
+      }
+    };
+
+    iframe.onload = () => {
+      const iframeWindow = iframe.contentWindow;
+      const iframeDoc = iframeWindow?.document;
+
+      if (!iframeWindow || !iframeDoc) {
+        cleanup();
+        return;
+      }
+
+      const executePrint = () => {
+        iframeWindow.focus();
+        iframeWindow.print();
+        cleanup();
+      };
+
+      const img = iframeDoc.getElementById("print-image") as HTMLImageElement | null;
+
+      if (!img) {
+        setTimeout(executePrint, 50);
+        return;
+      }
+
+      if (img.complete) {
+        setTimeout(executePrint, 50);
+      } else {
+        img.onload = () => setTimeout(executePrint, 50);
+        img.onerror = cleanup;
+      }
+    };
+
+    iframe.srcdoc = `<!DOCTYPE html><html><head><title>列印模板</title>
+      <style>
+        @page { size: 210mm 297mm; margin: 0; }
+        html, body { margin: 0; padding: 0; width: 210mm; height: 297mm; display: flex; align-items: center; justify-content: center; }
+        img { width: 210mm; height: 297mm; }
+      </style>
+    </head><body>
+      <img id="print-image" src="${dataUrl}" alt="Template" />
+    </body></html>`;
+  }, []);
 
   // 初始化 Canvas
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // 初始化時使用預設尺寸（A4 比例）
+    // 初始化時使用標準 A4 尺寸（21cm × 29.7cm @ 96 DPI）
     const canvas = new fabric.Canvas(canvasRef.current, {
-      width: 595,
-      height: 842,
+      width: 794,
+      height: 1123,
       backgroundColor: "#f8f9fa",
     });
 
@@ -46,15 +113,18 @@ export default function TemplateEditor({
           const currentCanvas = fabricCanvasRef.current;
           if (!currentCanvas) return;
           
-          // 固定 Canvas 尺寸為 A4 比例（可根據螢幕調整）
-          const canvasWidth = 600;  // 固定寬度
-          const canvasHeight = 848; // A4 比例 (600 * 1.414)
+          // 標準 A4 尺寸（21cm × 29.7cm @ 96 DPI）
+          const canvasWidth = 794;   // 21cm
+          const canvasHeight = 1123; // 29.7cm
           
           // 調整 Canvas 尺寸
           currentCanvas.setDimensions({
             width: canvasWidth,
             height: canvasHeight
           });
+          
+          // 設置有影像狀態
+          setHasImage(true);
           
           // 創建 Fabric.js 圖片物件
           const fabricImg = new fabric.Image(imgElement);
@@ -250,29 +320,43 @@ export default function TemplateEditor({
   // 欄位編輯功能已移至 DraggableFieldList 組件
 
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            模板編輯器
+    <Card className="overflow-hidden" style={{ width: 'fit-content', marginTop: '1px' }}>
+      <CardHeader className="py-3">
+        <CardTitle className="flex items-center justify-between text-base">
+          <div className="flex items-center gap-2">
+            <span>模板編輯器</span>
+            <span className="text-xs text-pc-text-muted font-normal">專業尺規視圖</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button onClick={handlePrint} variant="outline" size="sm">
+              列印
+            </Button>
             <Button onClick={addField} disabled={isDrawing} size="sm">
               {isDrawing ? "繪製中..." : "添加欄位"}
             </Button>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="border rounded-lg overflow-hidden bg-muted/30">
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div 
+          className="overflow-auto" 
+          style={{ 
+            height: hasImage ? 'fit-content' : '400px',
+            maxHeight: hasImage ? 'none' : '400px'
+          }}
+        >
+          <EditorWithRuler width={794} height={1123} showGrid={true} unit="cm">
             <canvas
               ref={canvasRef}
               className="block"
               style={{ maxWidth: "100%", height: "auto" }}
             />
-          </div>
-          {isDrawing && (
-            <p className="text-sm text-blue-600 mt-2">拖拽鼠標繪製欄位區域</p>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          </EditorWithRuler>
+        </div>
+        {isDrawing && (
+          <p className="text-sm text-blue-600 mt-2 px-6">拖拽鼠標繪製欄位區域</p>
+        )}
+      </CardContent>
+    </Card>
   );
 }

@@ -66,7 +66,7 @@ export default function WorkflowContent({
   };
 
   return (
-    <main className="flex-1 gap-6 px-6 pb-8 pt-6 lg:grid lg:grid-cols-[minmax(18rem,26rem)_1fr]">
+    <main className="flex-1 gap-6 px-0 pb-0 pt-6 lg:grid lg:grid-cols-[minmax(18rem,26rem)_1fr] lg:items-start">
       {/* 左側區域 */}
       <section className="mb-6 space-y-6 lg:mb-0">
         <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "single" | "batch")}>
@@ -249,7 +249,7 @@ export default function WorkflowContent({
       {/* 右側區域 */}
       <section className="flex h-full flex-col">
         <Card className="flex h-full flex-1 flex-col">
-          <CardHeader>
+          <CardHeader className="py-3">
             <CardTitle className="text-base">
               {isBatchMode
                 ? "批量處理預覽"
@@ -277,8 +277,8 @@ export default function WorkflowContent({
                 {ocrInitializing && <Loader2 className="h-6 w-6 animate-spin" />}
               </div>
             ) : (
-              <div className="flex h-full w-full">
-                <div className="flex-1 overflow-auto px-4 py-2">
+              <div className="flex h-full w-full gap-6">
+                <div className="flex-1 overflow-auto pl-6 pr-0 pt-0 pb-2">
                   <div className="mx-auto max-w-[980px]">
                     <TemplateEditor
                       canvasData={canvasData ?? undefined}
@@ -287,14 +287,17 @@ export default function WorkflowContent({
                     />
                   </div>
                 </div>
-                <aside className="w-[320px] border-l bg-background px-3 py-3 flex flex-col">
-                  <div className="mb-3 text-sm font-medium">欄位清單</div>
-                  <div
-                    className="overflow-y-auto pr-1 rounded-lg border bg-muted/30 p-3"
-                    style={{ height: "848px" }}
-                  >
-                    <DraggableFieldList fields={fields} onFieldsChange={onFieldsChange} />
-                  </div>
+                <aside className="w-[320px] pr-6 flex flex-col h-full">
+                  <Card className="flex flex-col flex-1 overflow-hidden">
+                    <CardHeader className="py-3 flex-shrink-0">
+                      <CardTitle className="text-base">欄位清單</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1 overflow-y-auto p-0">
+                      <div className="px-6 py-4">
+                        <DraggableFieldList fields={fields} onFieldsChange={onFieldsChange} />
+                      </div>
+                    </CardContent>
+                  </Card>
                 </aside>
               </div>
             )}

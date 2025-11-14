@@ -417,10 +417,34 @@ export default function TemplateManager() {
         throw new Error("沒有可用的畫布資料，請確認文件是否為 PDF 或圖像格式。");
       }
 
-      // 1) 優先用後端 pdf2json
+      // 1) 優先使用新的四邊框檢測（更準確）
       let finalFields: FieldArea[] = [];
-      if (uploadResult.file) {
+      
+      // 先嘗試使用新的圖像檢測方法（檢測四邊框）
+      const imageEl = new Image();
+      imageEl.src = workingCanvas.toDataURL();
+      await new Promise((resolve) => {
+        imageEl.onload = resolve;
+      });
+      
+      // 傳入目標顯示尺寸（A4 標準尺寸）來計算縮放比例
+      const targetWidth = 794;  // A4 寬度
+      const targetHeight = 1123; // A4 高度
+      const detectedFields = await FieldDetectionService.detectFieldsFromImage(
+        imageEl,
+        targetWidth,
+        targetHeight
+      );
+      
+      if (detectedFields.length > 0) {
+        console.log(`✅ 使用四邊框檢測，找到 ${detectedFields.length} 個欄位`);
+        finalFields = sortFieldsByRowAndX(detectedFields);
+      }
+      
+      // 2) 如果四邊框檢測沒有結果，嘗試後端 pdf2json
+      if (finalFields.length === 0 && uploadResult.file) {
         try {
+          console.log('四邊框檢測無結果，嘗試後端 PDF 解析');
           const form = new FormData();
           form.append("file", uploadResult.file);
           const resp = await fetch("/api/pdf", { method: "POST", body: form });
@@ -455,17 +479,18 @@ export default function TemplateManager() {
         }
       }
 
-      // 2) 若後端沒有多欄，改用 OCR 備援
-      if (finalFields.length <= 1) {
+      // 3) 最後才用 OCR 備援
+      if (finalFields.length === 0) {
+        console.log('前兩種方法都無結果，使用 OCR 備援');
         const ocrLayout = await OCRService.extractTextAndLayout(workingCanvas);
-        const detectedFields = await FieldDetectionService.detectFieldsFromLayout(
+        const ocrFields = await FieldDetectionService.detectFieldsFromLayout(
           ocrLayout,
           workingCanvas.width || 800,
           workingCanvas.height || 600,
         );
 
-        if (detectedFields.length > 0) {
-          const named = autoNameFieldsFromWords(detectedFields, ocrLayout.words);
+        if (ocrFields.length > 0) {
+          const named = autoNameFieldsFromWords(ocrFields, ocrLayout.words);
           finalFields = sortFieldsByRowAndX(named);
         }
       }

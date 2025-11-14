@@ -38,3 +38,12 @@ Thumbs.db
 # 臨時文件
 *.tmp
 *.temp
+
+# Docker
+.dockerignore
+
+# Vercel
+.vercel
+
+# 版本歷史（可選：如果想追蹤版本歷史，移除此行）
+.version-history.json

@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Docker 部署支持 - 啟用 standalone 輸出
+  output: "standalone",
+
   typescript: {
     // 暫時忽略 TypeScript 錯誤
     ignoreBuildErrors: true,

@@ -1,7 +1,7 @@
 {
   "name": "@tabletemplate/pro",
   "version": "1.0.0",
-  "description": "PrintCoord - 智慧表格處理系統",
+  "description": "PrintCoord - 智慧表格模板管理系統",
   "main": "index.ts",
   "module": "index.ts",
   "types": "index.ts",
@@ -12,10 +12,16 @@
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:js": "eslint \"**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "ci": "pnpm lint && pnpm type-check && pnpm test && pnpm build",
+    "vercel-build": "pnpm build",
+    "prepare": "husky install || true",
+    "version:bump": "node scripts/bump-version.js",
+    "postbuild": "node scripts/bump-version.js"
   },
   "keywords": [
     "table",

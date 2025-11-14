@@ -5,9 +5,172 @@
 import { OCRResult, FieldArea, FieldType } from "../types";
 import { OCRService } from "./ocrService";
 
+/**
+ * 矩形邊框接口
+ */
+interface Rectangle {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * 從圖像中檢測四邊框
+ * 使用改進的邊緣檢測算法
+ */
+function detectBorderedRectangles(imageData: ImageData): Rectangle[] {
+  const { width, height, data } = imageData;
+
+  // 1. 邊緣檢測 - 找出所有深色像素
+  const edges: boolean[][] = [];
+  for (let y = 0; y < height; y++) {
+    edges[y] = [];
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+      // 判斷是否為深色（邊框）- 降低閾值以檢測更多邊框
+      const isDark = (r + g + b) / 3 < 180;
+      edges[y][x] = isDark;
+    }
+  }
+
+  // 2. 檢測水平線和垂直線
+  const horizontalLines: number[] = [];
+  const verticalLines: number[] = [];
+
+  // 檢測水平線（掃描每一行）
+  for (let y = 0; y < height; y++) {
+    let darkCount = 0;
+    for (let x = 0; x < width; x++) {
+      if (edges[y][x]) darkCount++;
+    }
+    // 如果這一行有超過 50% 的深色像素，認為是水平線
+    if (darkCount / width > 0.5) {
+      horizontalLines.push(y);
+    }
+  }
+
+  // 檢測垂直線（掃描每一列）
+  for (let x = 0; x < width; x++) {
+    let darkCount = 0;
+    for (let y = 0; y < height; y++) {
+      if (edges[y][x]) darkCount++;
+    }
+    // 如果這一列有超過 50% 的深色像素，認為是垂直線
+    if (darkCount / height > 0.5) {
+      verticalLines.push(x);
+    }
+  }
+
+  // 3. 合併相近的線條（去除重複）
+  const mergeLines = (lines: number[], threshold: number = 3): number[] => {
+    if (lines.length === 0) return [];
+    const merged = [lines[0]];
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i] - merged[merged.length - 1] > threshold) {
+        merged.push(lines[i]);
+      }
+    }
+    return merged;
+  };
+
+  const hLines = mergeLines(horizontalLines);
+  const vLines = mergeLines(verticalLines);
+
+  console.log(`檢測到 ${hLines.length} 條水平線，${vLines.length} 條垂直線`);
+
+  // 4. 根據線條生成矩形（調整邊框位置，讓框更貼合內容）
+  const rectangles: Rectangle[] = [];
+  const borderThickness = 2; // 邊框厚度
+
+  for (let i = 0; i < hLines.length - 1; i++) {
+    for (let j = 0; j < vLines.length - 1; j++) {
+      // 調整位置，跳過邊框線本身
+      const x = vLines[j] + borderThickness;
+      const y = hLines[i] + borderThickness;
+      const width = vLines[j + 1] - vLines[j] - borderThickness * 2;
+      const height = hLines[i + 1] - hLines[i] - borderThickness * 2;
+
+      // 過濾太小的矩形
+      if (width > 20 && height > 20) {
+        rectangles.push({ x, y, width, height });
+      }
+    }
+  }
+
+  console.log(`生成 ${rectangles.length} 個矩形欄位`);
+  return rectangles;
+}
+
 export class FieldDetectionService {
   /**
-   * 從 OCR 結果中檢測可能的欄位
+   * 從圖像中檢測有四邊框的欄位
+   * 這是新的主要檢測方法
+   *
+   * @param imageElement - 圖像元素
+   * @param targetWidth - 目標顯示寬度（用於縮放調整）
+   * @param targetHeight - 目標顯示高度（用於縮放調整）
+   */
+  static async detectFieldsFromImage(
+    imageElement: HTMLImageElement,
+    targetWidth?: number,
+    targetHeight?: number
+  ): Promise<FieldArea[]> {
+    // 創建 Canvas 來處理圖像
+    const canvas = document.createElement("canvas");
+    canvas.width = imageElement.width;
+    canvas.height = imageElement.height;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      console.error("無法獲取 Canvas context");
+      return [];
+    }
+
+    // 繪製圖像到 Canvas
+    ctx.drawImage(imageElement, 0, 0);
+
+    // 獲取圖像數據
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    // 檢測四邊框矩形
+    const rectangles = detectBorderedRectangles(imageData);
+
+    // 計算縮放比例
+    const scaleX = targetWidth ? targetWidth / imageElement.width : 1;
+    const scaleY = targetHeight ? targetHeight / imageElement.height : 1;
+
+    console.log(`原始圖片尺寸: ${imageElement.width} × ${imageElement.height}`);
+    console.log(`目標顯示尺寸: ${targetWidth} × ${targetHeight}`);
+    console.log(`縮放比例: ${scaleX.toFixed(3)} × ${scaleY.toFixed(3)}`);
+
+    // 轉換為 FieldArea 格式，並應用縮放比例
+    const fields: FieldArea[] = rectangles.map((rect, index) => ({
+      id: `field_${Date.now()}_${index}`,
+      name: `欄位_${index + 1}`,
+      labelZh: `欄位 ${index + 1}`,
+      fieldType: "text" as FieldType,
+      position: {
+        x: rect.x * scaleX,
+        y: rect.y * scaleY,
+      },
+      size: {
+        width: rect.width * scaleX,
+        height: rect.height * scaleY,
+      },
+      required: false,
+      validation: {},
+    }));
+
+    console.log(`檢測到 ${fields.length} 個有四邊框的欄位（已應用縮放）`);
+    return fields;
+  }
+
+  /**
+   * 從 OCR 結果中檢測可能的欄位（舊方法，保留作為備用）
    */
   static async detectFieldsFromLayout(
     layoutData: { words: OCRResult[]; lines: OCRResult[]; blocks: OCRResult[] },
