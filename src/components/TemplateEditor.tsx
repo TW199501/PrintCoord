@@ -43,12 +43,15 @@ export default function TemplateEditor({
         const imgElement = new Image();
         imgElement.crossOrigin = 'anonymous';
         imgElement.onload = () => {
+          const currentCanvas = fabricCanvasRef.current;
+          if (!currentCanvas) return;
+          
           // 固定 Canvas 尺寸為 A4 比例（可根據螢幕調整）
           const canvasWidth = 600;  // 固定寬度
           const canvasHeight = 848; // A4 比例 (600 * 1.414)
           
           // 調整 Canvas 尺寸
-          canvas.setDimensions({
+          currentCanvas.setDimensions({
             width: canvasWidth,
             height: canvasHeight
           });
@@ -72,8 +75,8 @@ export default function TemplateEditor({
           });
           
           // 使用 Fabric.js 6.x 的方式設置背景圖片
-          canvas.backgroundImage = fabricImg;
-          canvas.renderAll();
+          currentCanvas.backgroundImage = fabricImg;
+          currentCanvas.renderAll();
         };
         imgElement.onerror = () => {
           console.warn('無法載入背景圖片: 圖片載入失敗');

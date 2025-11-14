@@ -40,13 +40,23 @@ export default function StepIndicator({
 
   return (
     <section
-      className="flex items-center justify-between border-b bg-muted/50 px-6"
+      className="relative flex items-center justify-between border-b border-pc-border bg-pc-bg dark:bg-slate-900 px-6"
       style={{ minHeight: "2.5em" }}
     >
+      {/* 進度條背景 - 品牌色漸層 */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-pc-border dark:bg-slate-700">
+        <div 
+          className="h-full bg-gradient-to-r from-pc-primary via-pc-secondary to-pc-accent transition-all duration-500 ease-out"
+          style={{ 
+            width: currentStep === "upload" ? "33%" : currentStep === "edit" ? "66%" : "100%"
+          }}
+        />
+      </div>
+      
       <div className="flex items-center gap-4 py-2">
         <Badge
           variant="outline"
-          className="px-3 py-1 text-xs uppercase tracking-wide"
+          className="px-3 py-1 text-xs uppercase tracking-wide bg-pc-accent text-white border-0 shadow-sm font-semibold"
         >
           Step {stepNumber}
         </Badge>
@@ -80,7 +90,11 @@ export default function StepIndicator({
           >
             上一步
           </Button>
-          <Button disabled={!canProceed} onClick={onNext}>
+          <Button 
+            disabled={!canProceed} 
+            onClick={onNext}
+            className="bg-gradient-to-r from-pc-primary to-pc-secondary hover:from-pc-primary-dark hover:to-pc-secondary text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+          >
             {currentStep === "preview" ? "完成" : "前往下一步"}
           </Button>
         </div>

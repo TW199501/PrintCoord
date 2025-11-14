@@ -77,8 +77,8 @@ export default function WorkflowContent({
 
           <TabsContent value="single" className="space-y-6">
             {/* 步驟 1：上傳文件 */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <Card className="border-t-4 border-t-pc-primary shadow-sm hover:shadow-md transition-shadow bg-pc-bg-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b border-pc-border">
                 <div>
                   <CardTitle className="text-base">步驟 1：上傳文件</CardTitle>
                   <p className="text-xs text-muted-foreground">支援 Word / PDF</p>

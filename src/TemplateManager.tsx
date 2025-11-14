@@ -539,7 +539,7 @@ export default function TemplateManager() {
   const hasFile = Boolean(uploadResult?.file);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-pc-bg dark:bg-slate-950 text-pc-text dark:text-foreground">
       <TemplateHeader
         language={language}
         onLanguageChange={handleLanguageChange}

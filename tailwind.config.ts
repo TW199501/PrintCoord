@@ -8,18 +8,39 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx}",
     "./src/lib/**/*.{js,ts,jsx,tsx}",
     "./src/services/**/*.{js,ts,jsx,tsx}",
-    "./src/TemplateManager.tsx"
+    "./src/TemplateManager.tsx",
   ],
   theme: {
     container: {
       center: true,
       padding: "1.5rem",
       screens: {
-        "2xl": "1400px"
-      }
+        "2xl": "1400px",
+      },
     },
     extend: {
       colors: {
+        // PrintCoord 品牌色系
+        "pc-primary": {
+          DEFAULT: "#3BC8FF", // 主品牌藍
+          dark: "#2563EB", // 深藍（Hover）
+        },
+        "pc-secondary": "#5A5CFF", // 藍紫
+        "pc-accent": "#FFB347", // 橘色強調
+        "pc-bg": {
+          DEFAULT: "#F3F4F6", // 頁面背景
+          card: "#FFFFFF", // 卡片背景
+        },
+        "pc-border": "#E2E8F0", // 邊框
+        "pc-text": {
+          DEFAULT: "#0F172A", // 主文字
+          muted: "#64748B", // 次文字
+        },
+        "pc-success": "#22C55E",
+        "pc-warning": "#F59E0B",
+        "pc-error": "#EF4444",
+
+        // 保留原有的 shadcn/ui 顏色系統
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -27,55 +48,55 @@ const config: Config = {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))"
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))"
+          foreground: "hsl(var(--secondary-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))"
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))"
+          foreground: "hsl(var(--accent-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))"
+          foreground: "hsl(var(--destructive-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))"
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
           DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))"
-        }
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)"
+        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" }
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" }
-        }
+          to: { height: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out"
-      }
-    }
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
   },
-  plugins: [tailwindcssAnimate]
+  plugins: [tailwindcssAnimate],
 };
 
 export default config;

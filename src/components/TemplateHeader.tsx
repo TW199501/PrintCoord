@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Grid3x3 } from "lucide-react";
 
 interface TemplateHeaderProps {
   language: string;
@@ -26,15 +26,21 @@ export default function TemplateHeader({
 }: TemplateHeaderProps) {
   return (
     <>
-      {/* 頂部 Header */}
-      <header className="flex items-center gap-6 border-b bg-background/95 px-6 py-2 backdrop-blur">
+      {/* 頂部 Header - PrintCoord 品牌色 */}
+      <header className="relative flex items-center gap-6 border-b border-pc-border bg-white dark:bg-slate-900 px-6 py-3 shadow-sm">
+        {/* 漸層裝飾線 - 品牌色 */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pc-primary via-pc-secondary to-pc-accent"></div>
+        
         <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
-            TT
+          {/* Logo - 品牌漸層 */}
+          <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-pc-primary to-pc-secondary shadow-lg shadow-pc-primary/30">
+            <Grid3x3 className="h-6 w-6 text-white" strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-lg font-semibold">PrintCoord</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-pc-primary to-pc-secondary bg-clip-text text-transparent">
+              PrintCoord
+            </h1>
+            <p className="text-xs text-pc-text-muted font-medium">
               智慧表格模板管理系統
             </p>
           </div>
