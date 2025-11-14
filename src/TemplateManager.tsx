@@ -573,13 +573,13 @@ export default function TemplateManager() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="flex items-center gap-6 border-b bg-background/95 px-6 py-4 backdrop-blur">
+      <header className="flex items-center gap-6 border-b bg-background/95 px-6 py-2 backdrop-blur">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
             TT
           </div>
           <div>
-            <h1 className="text-xl font-semibold">PrintCoord</h1>
+            <h1 className="text-lg font-semibold">PrintCoord</h1>
             <p className="text-sm text-muted-foreground">
               智慧表格模板管理系統
             </p>
@@ -618,9 +618,9 @@ export default function TemplateManager() {
 
       <section
         className="flex items-center justify-between border-b bg-muted/50 px-6"
-        style={{ minHeight: "3em" }}
+        style={{ minHeight: "2.5em" }}
       >
-        <div className="flex items-center gap-4 py-3">
+        <div className="flex items-center gap-4 py-2">
           <Badge
             variant="outline"
             className="px-3 py-1 text-xs uppercase tracking-wide"
@@ -641,7 +641,7 @@ export default function TemplateManager() {
           )}
         </div>
 
-        <div className="flex items-center gap-3 py-3">
+        <div className="flex items-center gap-3 py-2">
           <Button
             variant="ghost"
             disabled={!hasFile && fields.length === 0 && !templateConfig.name}
