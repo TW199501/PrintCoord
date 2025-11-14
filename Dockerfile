@@ -16,8 +16,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# 安裝生產依賴
-RUN pnpm install --frozen-lockfile --prod=false
+# 安裝生產依賴（容器內避免 frozen-lockfile 以兼容 workspace 調整）
+RUN pnpm install --no-frozen-lockfile --prod=false
 
 # ============================================
 # Stage 2: 構建應用
