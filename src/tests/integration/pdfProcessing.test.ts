@@ -137,26 +137,36 @@ describe("FileProcessingService - PDF Processing Tests", () => {
     });
 
     it("應該處理 PDF 解析錯誤", async () => {
-      // 模擬 PDF 解析失敗
-      const pdfjs = require("pdfjs-dist/build/pdf.mjs");
-      pdfjs.getDocument.mockReturnValueOnce({
-        promise: Promise.reject(new Error("Invalid PDF")),
-      });
+      // 靜音 console.error，避免測試因錯誤輸出而失敗
+      const errorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
-      const mockFile = new File(["invalid content"], "invalid.pdf", {
-        type: "application/pdf",
-      });
+      try {
+        // 模擬 PDF 解析失敗
+        const pdfjs = require("pdfjs-dist/build/pdf.mjs");
+        pdfjs.getDocument.mockReturnValueOnce({
+          promise: Promise.reject(new Error("Invalid PDF")),
+        });
 
-      Object.defineProperty(mockFile, "arrayBuffer", {
-        value: () => Promise.resolve(new ArrayBuffer(100)),
-        writable: true,
-        configurable: true,
-      });
+        const mockFile = new File(["invalid content"], "invalid.pdf", {
+          type: "application/pdf",
+        });
 
-      const result = await FileProcessingService.processFile(mockFile);
+        Object.defineProperty(mockFile, "arrayBuffer", {
+          value: () => Promise.resolve(new ArrayBuffer(100)),
+          writable: true,
+          configurable: true,
+        });
 
-      expect(result.success).toBe(false);
-      expect(result.error).toContain("Invalid PDF");
+        const result = await FileProcessingService.processFile(mockFile);
+
+        // 驗證：應回傳失敗且包含錯誤字串
+        expect(result.success).toBe(false);
+        expect(result.error).toContain("Invalid PDF");
+      } finally {
+        errorSpy.mockRestore();
+      }
     });
   });
 });
