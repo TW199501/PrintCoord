@@ -13,7 +13,6 @@ RUN corepack enable && corepack prepare pnpm@8 --activate
 WORKDIR /app
 
 # 複製依賴文件
-COPY package.json pnpm-lock.yaml ./
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # 安裝生產依賴（容器內避免 frozen-lockfile 以兼容 workspace 調整）
