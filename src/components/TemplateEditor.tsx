@@ -38,9 +38,10 @@ export default function TemplateEditor({
   useEffect(() => {
     if (!canvasRef.current) return;
 
+    // 初始化時使用預設尺寸（A4 比例）
     const canvas = new fabric.Canvas(canvasRef.current, {
-      width: 800,
-      height: 600,
+      width: 595,
+      height: 842,
       backgroundColor: "#f8f9fa",
     });
 
@@ -53,19 +54,32 @@ export default function TemplateEditor({
         const imgElement = new Image();
         imgElement.crossOrigin = 'anonymous';
         imgElement.onload = () => {
+          // 固定 Canvas 尺寸為 A4 比例（可根據螢幕調整）
+          const canvasWidth = 600;  // 固定寬度
+          const canvasHeight = 848; // A4 比例 (600 * 1.414)
+          
+          // 調整 Canvas 尺寸
+          canvas.setDimensions({
+            width: canvasWidth,
+            height: canvasHeight
+          });
+          
           // 創建 Fabric.js 圖片物件
           const fabricImg = new fabric.Image(imgElement);
           
-          // 設置圖片尺寸以適應 canvas
-          const scaleX = canvas.width! / imgElement.width;
-          const scaleY = canvas.height! / imgElement.height;
-          const scale = Math.min(scaleX, scaleY);
+          // 計算縮放比例，讓圖片填滿整個 Canvas（使用 max 而非 min）
+          const scaleX = canvasWidth / imgElement.width;
+          const scaleY = canvasHeight / imgElement.height;
+          const scale = Math.max(scaleX, scaleY); // 使用 max 讓圖片填滿
           
+          // 圖片縮放並置中
           fabricImg.set({
             scaleX: scale,
             scaleY: scale,
             originX: 'left',
-            originY: 'top'
+            originY: 'top',
+            left: (canvasWidth - imgElement.width * scale) / 2,
+            top: (canvasHeight - imgElement.height * scale) / 2
           });
           
           // 使用 Fabric.js 6.x 的方式設置背景圖片
