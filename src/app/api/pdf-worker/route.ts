@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const runtime = "nodejs";
 import path from "path";
 import { promises as fsp } from "fs";
 
