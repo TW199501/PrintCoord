@@ -1,0 +1,5 @@
+onlyBuiltDependencies:
+  - canvas
+  - sharp
+  - tesseract.js
+  - unrs-resolver

@@ -1,0 +1,37 @@
+{
+  "brand": "Elf Admin",
+  "tagline": "提供團隊使用的國際化管理後台模板。",
+  "nav": {
+    "home": "首頁",
+    "invoice": "發票"
+  },
+  "language": {
+    "label": "語言",
+    "enUS": "英文",
+    "zhTW": "繁體",
+    "zhCN": "簡體"
+  },
+  "theme": {
+    "toggle": "切換主題",
+    "accent": "主色"
+  },
+  "accent": {
+    "label": "主色",
+    "indigo": "靛藍",
+    "violet": "紫羅蘭",
+    "blue": "藍色",
+    "teal": "青綠",
+    "green": "綠色",
+    "amber": "琥珀",
+    "rose": "玫瑰"
+  },
+  "hero": {
+    "title": "Next.js 16 • TypeScript • Tailwind CSS • next-intl",
+    "description": "使用此模板快速建立具備國際化與主題控制的介面骨架。",
+    "cta": "開始使用模板"
+  },
+  "footer": {
+    "about": "為國際化管理介面打造的 Next.js 起始模板。",
+    "rights": "保留所有權利。"
+  }
+}

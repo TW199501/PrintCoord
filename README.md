@@ -1,4 +1,4 @@
-# TableTemplate Pro
+# PrintCoord
 
 智慧表格處理系統 - 基於 AI 的文件模板識別與處理解決方案
 
@@ -166,7 +166,7 @@ const results = await BatchProcessorService.processBatch(
 
 ## 🎨 自定義樣式
 
-TableTemplate Pro 使用 Tailwind CSS 進行樣式設計，你可以通過以下方式自定義：
+PrintCoord 使用 Tailwind CSS 進行樣式設計，你可以通過以下方式自定義：
 
 ```css
 /* 自定義主題色彩 */
@@ -261,6 +261,6 @@ MIT License - 詳見 [LICENSE](LICENSE) 文件
 
 ---
 
-**TableTemplate Pro** - 讓表格處理變得智慧而簡單 ✨
+**PrintCoord** - 讓表格處理變得智慧而簡單 ✨
 
 *支持最新的 React 19 和 Next.js 16 技術棧*

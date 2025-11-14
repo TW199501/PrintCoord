@@ -1,7 +1,9 @@
 # 編譯輸出
-dist/
+
 build/
 *.tsbuildinfo
+# next.js
+/.next/
 
 # 依賴
 node_modules/
