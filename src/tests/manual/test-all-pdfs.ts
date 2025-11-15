@@ -4,7 +4,7 @@
 
 import fs from "fs";
 import path from "path";
-import { PDF2JSONService } from "./src/services/pdf2jsonService";
+import { PDF2JSONService } from "../../services/pdf2jsonService";
 
 async function testPDF(filename: string) {
   console.log(`\n${"=".repeat(60)}`);
@@ -21,19 +21,19 @@ async function testPDF(filename: string) {
   const pdfBuffer = fs.readFileSync(pdfPath);
 
   try {
-    const fields = await PDF2JSONService.detectFieldsFromPDF(pdfBuffer);
+    const fields: any[] = await PDF2JSONService.detectFieldsFromPDF(pdfBuffer);
 
     console.log(`\n✅ Successfully detected ${fields.length} fields\n`);
 
     if (fields.length > 0) {
       console.log("First 15 fields:");
-      fields.slice(0, 15).forEach((field, idx) => {
+      fields.slice(0, 15).forEach((field: any, idx: number) => {
         console.log(`${idx + 1}. [${field.name}] "${field.defaultValue}"`);
       });
 
       // Group by rows
-      const rowMap = new Map<number, typeof fields>();
-      fields.forEach((field) => {
+      const rowMap = new Map<number, any[]>();
+      fields.forEach((field: any) => {
         const rowMatch = field.id.match(/r(\d+)/);
         if (rowMatch) {
           const rowNum = parseInt(rowMatch[1]);
@@ -48,10 +48,10 @@ async function testPDF(filename: string) {
       console.log(`Total rows: ${rowMap.size}\n`);
 
       Array.from(rowMap.entries())
-        .sort((a, b) => a[0] - b[0])
+        .sort((a: [number, any[]], b: [number, any[]]) => a[0] - b[0])
         .slice(0, 5)
-        .forEach(([rowNum, rowFields]) => {
-          const sortedFields = rowFields.sort((a, b) => {
+        .forEach(([rowNum, rowFields]: [number, any[]]) => {
+          const sortedFields = rowFields.sort((a: any, b: any) => {
             const aCol = parseInt(a.id.match(/c(\d+)/)?.[1] || "0");
             const bCol = parseInt(b.id.match(/c(\d+)/)?.[1] || "0");
             return aCol - bCol;
@@ -59,7 +59,7 @@ async function testPDF(filename: string) {
 
           console.log(`Row ${rowNum} (${rowFields.length} cells):`);
           console.log(
-            `  ${sortedFields.map((f) => f.defaultValue).join(" | ")}\n`
+            `  ${sortedFields.map((f: any) => f.defaultValue).join(" | ")}\n`
           );
         });
     }

@@ -1,0 +1,82 @@
+// Prisma schema for PrintCoord using Vercel Prisma Postgres
+// Maps existing SQL tables (pdf_documents, table_structures, detected_fields)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PdfDocument {
+  id              String            @id @db.VarChar(64)
+  filename        String            @db.VarChar(255)
+  title           String?           @db.VarChar(255)
+  author          String?           @db.VarChar(255)
+  subject         String?           @db.VarChar(255)
+  creator         String?           @db.VarChar(255)
+  producer        String?           @db.VarChar(255)
+  pdfFormatVersion String?          @map("pdf_format_version") @db.VarChar(32)
+  creationDate    DateTime?         @map("creation_date")
+  modificationDate DateTime?        @map("modification_date")
+  pageCount       Int               @map("page_count")
+  status          String            @db.VarChar(32)
+  errorMessage    String?           @map("error_message")
+  rawData         Json              @map("raw_data")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @default(now()) @updatedAt @map("updated_at")
+
+  tables          TableStructure[]  @relation("DocumentTables")
+  fields          DetectedField[]   @relation("DocumentFields")
+
+  @@map("pdf_documents")
+  @@index([status], map: "idx_pdf_documents_status")
+  @@index([createdAt], map: "idx_pdf_documents_created_at")
+}
+
+model TableStructure {
+  id                String          @id @db.VarChar(64)
+  documentId        String          @map("document_id")
+  tableIndex        Int             @map("table_index")
+  rows              Int
+  columns           Int
+  detectionStrategy String          @map("detection_strategy")
+  confidence        Float?
+  boundaries        Json            @db.Json
+  rawStructure      Json?           @map("raw_structure")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  document PdfDocument @relation("DocumentTables", fields: [documentId], references: [id], onDelete: Cascade)
+  fields   DetectedField[]
+
+  @@map("table_structures")
+  @@index([documentId], map: "idx_table_structures_document")
+}
+
+model DetectedField {
+  id          String    @id @db.VarChar(64)
+  documentId  String    @map("document_id")
+  tableId     String?   @map("table_id")
+  fieldName   String    @map("field_name") @db.VarChar(255)
+  fieldValue  String?   @map("field_value")
+  fieldType   String    @map("field_type") @db.VarChar(32)
+  positionX   Float     @map("position_x")
+  positionY   Float     @map("position_y")
+  width       Float
+  height      Float
+  confidence  Float?
+  cellRow     Int?      @map("cell_row")
+  cellColumn  Int?      @map("cell_column")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  document PdfDocument   @relation("DocumentFields", fields: [documentId], references: [id], onDelete: Cascade)
+  table    TableStructure? @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@map("detected_fields")
+  @@index([documentId], map: "idx_detected_fields_document")
+  @@index([tableId], map: "idx_detected_fields_table")
+}

@@ -175,27 +175,35 @@ export class FieldDetectionService {
   static async detectFieldsFromLayout(
     layoutData: { words: OCRResult[]; lines: OCRResult[]; blocks: OCRResult[] },
     imageWidth: number,
-    _imageHeight: number
+    imageHeight: number
   ): Promise<FieldArea[]> {
     const { words, lines } = layoutData;
 
     // 1. 偵測水平線和垂直線
-    const horizontalLines = (lines || []).filter(
-      (line) => line.bbox.x1 - line.bbox.x0 > (line.bbox.y1 - line.bbox.y0) * 2
-    );
-    const verticalLines = (lines || []).filter(
-      (line) => line.bbox.y1 - line.bbox.y0 > (line.bbox.x1 - line.bbox.x0) * 2
-    );
+    const horizontalLines = (lines || []).filter((line) => {
+      const [, , w, h] = line.bbox;
+      return w > h * 2;
+    });
+    const verticalLines = (lines || []).filter((line) => {
+      const [, , w, h] = line.bbox;
+      return h > w * 2;
+    });
 
     // 2. 確定格線座標
     const yCoords = [
       0,
-      ...horizontalLines.map((l) => l.bbox.y0),
+      ...horizontalLines.flatMap((line) => {
+        const [, y, , h] = line.bbox;
+        return [y, y + h];
+      }),
       imageHeight,
     ].sort((a, b) => a - b);
     const xCoords = [
       0,
-      ...verticalLines.map((l) => l.bbox.x0),
+      ...verticalLines.flatMap((line) => {
+        const [x, , w] = line.bbox;
+        return [x, x + w];
+      }),
       imageWidth,
     ].sort((a, b) => a - b);
 
