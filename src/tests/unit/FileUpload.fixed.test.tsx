@@ -10,15 +10,25 @@ import FileUpload from '@/components/FileUpload';
 // Mock 外部依賴
 jest.mock('@/services/fileProcessingService', () => ({
   FileProcessingService: {
-    processUploadedFile: jest.fn(),
+    processFile: jest.fn(),
   },
 }));
 
-// Mock useDropzone
+// Mock useDropzone，確保改變 input 會觸發 onDrop
 jest.mock('react-dropzone', () => ({
-  useDropzone: () => ({
+  useDropzone: (options: any) => ({
     getRootProps: () => ({ 'data-testid': 'dropzone' }),
-    getInputProps: () => ({ 'data-testid': 'file-input' }),
+    getInputProps: () => ({
+      'data-testid': 'file-input',
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files
+          ? Array.from(event.target.files)
+          : [];
+        if (options && typeof options.onDrop === 'function') {
+          options.onDrop(files);
+        }
+      },
+    }),
     open: jest.fn(),
     isDragActive: false,
     acceptedFiles: [],
@@ -38,7 +48,7 @@ describe('FileUpload - Fixed Tests', () => {
     const mockOnFileProcessed = jest.fn();
     const mockFile = new File(['test'], 'test.pdf', { type: 'application/pdf' });
     
-    (FileProcessingService.processUploadedFile as jest.Mock).mockResolvedValue({
+    (FileProcessingService.processFile as jest.Mock).mockResolvedValue({
       success: true,
       file: mockFile,
       pdfPages: [],
@@ -50,7 +60,7 @@ describe('FileUpload - Fixed Tests', () => {
     fireEvent.change(input, { target: { files: [mockFile] } });
 
     await waitFor(() => {
-      expect(FileProcessingService.processUploadedFile).toHaveBeenCalledWith(mockFile);
+      expect(FileProcessingService.processFile).toHaveBeenCalledWith(mockFile);
       expect(mockOnFileProcessed).toHaveBeenCalledWith({
         success: true,
         file: mockFile,
@@ -63,7 +73,7 @@ describe('FileUpload - Fixed Tests', () => {
     const mockOnFileProcessed = jest.fn();
     const mockFile = new File(['test'], 'test.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
     
-    (FileProcessingService.processUploadedFile as jest.Mock).mockResolvedValue({
+    (FileProcessingService.processFile as jest.Mock).mockResolvedValue({
       success: false,
       file: mockFile,
       error: '不支援的文件類型: application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -87,7 +97,7 @@ describe('FileUpload - Fixed Tests', () => {
     const mockOnFileProcessed = jest.fn();
     const mockFile = new File([], 'empty.pdf', { type: 'application/pdf' });
     
-    (FileProcessingService.processUploadedFile as jest.Mock).mockResolvedValue({
+    (FileProcessingService.processFile as jest.Mock).mockResolvedValue({
       success: false,
       file: mockFile,
       error: '文件大小為0',

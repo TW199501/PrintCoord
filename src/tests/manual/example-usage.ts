@@ -21,8 +21,8 @@ async function processPDF(filename: string) {
   console.log("\n📄 Parsing PDF...");
   const pdfData = await PDF2JSONService.parsePDF(pdfBuffer);
   console.log(`  ✓ Pages: ${pdfData.Pages.length}`);
-  console.log(`  ✓ Title: ${pdfData.Meta.Title || "N/A"}`);
-  console.log(`  ✓ Author: ${pdfData.Meta.Author || "N/A"}`);
+  console.log(`  ✓ Title: ${pdfData.Meta?.Title ?? "N/A"}`);
+  console.log(`  ✓ Author: ${pdfData.Meta?.Author ?? "N/A"}`);
 
   // 3. 檢測欄位
   console.log("\n🔍 Detecting fields...");

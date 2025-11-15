@@ -1,6 +1,6 @@
 // PrintCoord - 欄位檢測服務單元測試
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { FieldDetectionService } from "@/services/fieldDetection";
 import { FieldType, OCRResult } from "@/types";

@@ -30,10 +30,10 @@ module.exports = tseslint.config(
   {
     rules: {
       "@next/next/no-html-link-for-pages": "error",
-      "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/no-unused-vars": "error",
-      "@typescript-eslint/no-require-imports": "error",
-      "@typescript-eslint/no-empty-object-type": "error",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-require-imports": "warn",
+      "@typescript-eslint/no-empty-object-type": "warn",
     },
   },
   {

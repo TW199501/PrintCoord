@@ -1,6 +1,6 @@
 // PrintCoord - 整合測試
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { FileProcessingService } from "@/services/fileProcessingService";

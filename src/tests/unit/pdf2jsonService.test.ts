@@ -13,10 +13,10 @@ jest.mock("pdf2json", () => {
     const emitter = new EventEmitter();
 
     return {
-      on: (event: string, callback: Function) => {
+      on: (event: string, callback: (...args: unknown[]) => void) => {
         emitter.on(event, callback);
       },
-      parseBuffer: (buffer: Buffer) => {
+      parseBuffer: (_buffer: Buffer) => {
         // Simulate successful parsing with mock data
         setTimeout(() => {
           const mockPDFData = {
@@ -120,7 +120,7 @@ describe("PDF2JSONService", () => {
         const emitter = new EventEmitter();
 
         return {
-          on: (event: string, callback: Function) => {
+          on: (event: string, callback: (...args: unknown[]) => void) => {
             emitter.on(event, callback);
           },
           parseBuffer: () => {

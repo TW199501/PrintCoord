@@ -66,11 +66,15 @@ export class PDF2JSONService {
     const fRight = fx + fw;
     const fCenterY = fy + fh / 2;
 
-    let best: { text: string; dist: number } | null = null;
+    let bestLabel: string | null = null;
+    let bestDist = Number.POSITIVE_INFINITY;
     const consider = (txt: string, dist: number) => {
       const cleaned = decodeURIComponent(txt || "").trim();
       if (!cleaned) return;
-      if (!best || dist < best.dist) best = { text: cleaned, dist };
+      if (dist < bestDist) {
+        bestLabel = cleaned;
+        bestDist = dist;
+      }
     };
 
     // 1) Left side same row
@@ -87,7 +91,7 @@ export class PDF2JSONService {
     }
 
     // 2) Above
-    if (!best) {
+    if (!bestLabel) {
       for (const t of texts) {
         const wx = Number(t.x) || 0;
         const wy = Number(t.y) || 0;
@@ -106,7 +110,7 @@ export class PDF2JSONService {
     }
 
     // 3) Inside
-    if (!best) {
+    if (!bestLabel) {
       for (const t of texts) {
         const wx = Number(t.x) || 0;
         const wy = Number(t.y) || 0;
@@ -117,7 +121,7 @@ export class PDF2JSONService {
     }
 
     // 4) Right side small distance
-    if (!best) {
+    if (!bestLabel) {
       for (const t of texts) {
         const wx = Number(t.x) || 0;
         const wy = Number(t.y) || 0;
@@ -129,7 +133,7 @@ export class PDF2JSONService {
       }
     }
 
-    return { label: best ? best.text : null };
+    return { label: bestLabel };
   }
   /**
    * Parse PDF buffer and return structured data
