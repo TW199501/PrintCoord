@@ -29,12 +29,12 @@ export default async function LocaleLayout({
 }: Props) {
   const { locale } = await params;
 
-  // 驗證語言是否支援
-  if (!routing.locales.includes(locale as any)) {
+  // Validate if locale is supported
+  if (!routing.locales.includes(locale as typeof routing.locales[number])) {
     notFound();
   }
 
-  // 設定請求語言並載入訊息
+  // Set request locale and load messages
   setRequestLocale(locale);
   const messages = await getMessages();
 

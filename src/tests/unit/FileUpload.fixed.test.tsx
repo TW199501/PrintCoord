@@ -1,7 +1,7 @@
 // FileUpload 測試 - 修復版本
 // 這個文件修復了所有測試問題
 
-/* eslint-disable @typescript-eslint/no-require-imports */
+ 
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';

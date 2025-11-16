@@ -126,5 +126,41 @@
     "單位": "unit",
     "部門": "department",
     "日期": "date"
+  },
+  "templates": {
+    "stepIndicator": {
+      "reset": "reset",
+      "step": "{number}",
+      "scanning": "scanning",
+      "previous": "previous",
+      "complete": "complete",
+      "next": "next"
+    },
+    "workflowContent": {
+      "template": {
+        "descriptionPlaceholder": "Enter template description",
+        "originalFile": "Original file"
+      },
+      "tabs": {
+        "single": "Single Processing",
+        "batch": "Batch Processing"
+      },
+      "pdfPreview": {
+        "page": "Page {number}"
+      },
+      "steps": {
+        "upload": {
+          "title": "Step 1: Upload File"
+        }
+      }
+    }
+  },
+  "common": {
+    "language": {
+      "enUS": "English",
+      "zhTW": "English"
+    },
+    "brand": "PrintCoord",
+    "tagline": "The intelligent form template management system supports PDF/Word form files"
   }
 }

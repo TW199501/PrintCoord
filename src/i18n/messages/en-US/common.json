@@ -1,6 +1,7 @@
 {
   "brand": "PrintCoord",
-  "tagline": "Smart table template management for PDF and Word documents.",
+  "tagline": "The intelligent form template management system supports PDF/Word form files.",
+  "no-file-selected": "no file selsevt",
   "nav": {
     "home": "Home",
     "invoice": "Templates"
@@ -33,5 +34,19 @@
   "footer": {
     "about": "PrintCoord helps you build and manage table templates for scanned PDFs and documents.",
     "rights": "All rights reserved."
+  },
+  "templates": {
+    "stepIndicator": {
+      "previous": "previous"
+    }
+  },
+  "common": {
+    "theme": {
+      "toggle": "toggle"
+    },
+    "language": {
+      "zhCN": "English",
+      "zhTW": "Traditional Chinese"
+    }
   }
 }

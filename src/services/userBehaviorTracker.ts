@@ -64,7 +64,7 @@ export class UserBehaviorTracker {
   /**
    * 記錄一般用戶行為
    */
-  static recordAction(action: string, data?: any): void {
+  static recordAction(action: string, data?: unknown): void {
     const userAction: UserAction = {
       action,
       timestamp: new Date(),
@@ -279,7 +279,7 @@ export class UserBehaviorTracker {
     const actionsData = localStorage.getItem(this.ACTIONS_KEY);
     if (actionsData) {
       try {
-        this.actions = JSON.parse(actionsData).map((action: any) => ({
+        this.actions = JSON.parse(actionsData).map((action: { action: string; timestamp: string; data?: unknown }) => ({
           ...action,
           timestamp: new Date(action.timestamp),
         }));

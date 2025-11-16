@@ -37,6 +37,7 @@ export default function StepIndicator({
   canProceed,
 }: StepIndicatorProps) {
   const t = useTranslations('templates');
+  
   const stepNumber =
     currentStep === "upload" ? "01" : currentStep === "edit" ? "02" : "03";
 

@@ -126,5 +126,45 @@
     "單位": "unit",
     "部門": "department",
     "日期": "date"
+  },
+  "templates": {
+    "stepIndicator": {
+      "reset": "重置",
+      "step": "{number}",
+      "scanning": "掃描中",
+      "previous": "上一步",
+      "complete": "完全的",
+      "next": "下一個"
+    },
+    "workflowContent": {
+      "template": {
+        "descriptionPlaceholder": "輸入範本描述",
+        "originalFile": "原始文件"
+      },
+      "tabs": {
+        "batch": "批量處理",
+        "single": "單處理"
+      },
+      "steps": {
+        "upload": {
+          "title": "步驟 1：上傳文件"
+        }
+      },
+      "pdfPreview": {
+        "page": "第 {number} 頁"
+      }
+    }
+  },
+  "common": {
+    "theme": {
+      "toggle": "切換"
+    },
+    "language": {
+      "enUS": "繁體中文",
+      "zhCN": "繁體中文",
+      "zhTW": "繁體中文"
+    },
+    "brand": "PrintCoord",
+    "tagline": "智慧型表單範本管理系統支援PDF/Word表單檔案"
   }
 }

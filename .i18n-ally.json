@@ -1,0 +1,45 @@
+{
+  "pathMatcher": "./src/i18n/messages/{locale}/{namespace}.json",
+  "sourceLanguage": "en-US",
+  "languages": ["en-US", "zh-TW", "zh-CN"],
+  "namespace": true,
+  "indent": "\t",
+  "keySeparator": ".",
+  "namespaceSeparator": ".",
+  "translationFolders": ["./src/i18n/messages"],
+  "treeView": {
+    "enable": true,
+    "grouping": "namespace",
+    "showMissingTranslations": true,
+    "showUnusedTranslations": true,
+    "autoExpand": true
+  },
+  "editor": {
+    "enable": true,
+    "hover": true,
+    "completion": true,
+    "diagnostic": true,
+    "codeAction": true,
+    "documentFormatting": true
+  },
+  "quickPick": {
+    "enable": true,
+    "grouping": "namespace",
+    "showNamespace": true
+  },
+  "translationStatus": {
+    "enable": true,
+    "showInStatusBar": true,
+    "showInTreeView": true
+  },
+  "typescript": {
+    "enable": true,
+    "autoApply": true,
+    "path": "./src/types/i18n.d.ts"
+  },
+  "machineTranslation": {
+    "enable": true,
+    "provider": "deepl",
+    "autoDetectSourceLanguage": true
+  }
+}

@@ -68,11 +68,11 @@ export default function TemplateManager() {
     OCRService.initialize()
       .then(() => {
         setOcrInitializing(false);
-        console.log("OCR Service ready"); // t('logs.ocrReady')
+        console.log("OCR Service ready");
       })
       .catch(error => {
         console.error("OCR Initialization failed:", error);
-        setOcrError("OCR engine failed to load"); // t('errors.ocrInitFailed')
+        setOcrError("OCR engine failed to load");
         setOcrInitializing(false);
       });
 

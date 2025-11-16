@@ -5,6 +5,7 @@ import { useDropzone, type FileRejection } from "react-dropzone";
 import { Upload, X, CheckCircle } from "lucide-react";
 import { FileUploadResult } from "../types";
 import { FileProcessingService } from "@/services/fileProcessingService";
+import { useTranslations } from "next-intl";
 
 interface FileUploadProps {
   onFileProcessed: (result: FileUploadResult) => void;
@@ -19,6 +20,7 @@ export default function FileUpload({
   maxSize = 10,
   maxPdfSize = 20, // PDF 可以稍大一些
 }: FileUploadProps) {
+  const t = useTranslations('common');
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadResult, setUploadResult] = useState<FileUploadResult | null>(
     null,
@@ -34,7 +36,7 @@ export default function FileUpload({
       if (!file) {
         const errorResult: FileUploadResult = {
           success: false,
-          error: "沒有選擇文件",
+          error: t('no-file-selected'),
         };
         setUploadResult(errorResult);
         onFileProcessed(errorResult);

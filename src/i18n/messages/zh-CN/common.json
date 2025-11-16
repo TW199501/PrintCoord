@@ -1,6 +1,7 @@
 {
   "brand": "PrintCoord",
   "tagline": "智慧表格模板管理系统，支持 PDF / Word 表单文件。",
+  "no-file-selected": "未选择文件",
   "nav": {
     "home": "首页",
     "invoice": "模板"
@@ -33,5 +34,15 @@
   "footer": {
     "about": "PrintCoord 帮助你为扫描 PDF 与文档建立并管理表格模板。",
     "rights": "保留所有权利。"
+  },
+  "templates": {
+    "stepIndicator": {
+      "step": ""
+    }
+  },
+  "common": {
+    "theme": {
+      "toggle": ""
+    }
   }
 }

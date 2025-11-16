@@ -8,9 +8,12 @@ export default getRequestConfig(async ({ requestLocale }) => {
     : defaultLocale;
 
   // 動態載入對應語言的訊息文件
+  const commonMessages = await import(`./src/i18n/messages/${locale}/common.json`);
+  const templateMessages = await import(`./src/i18n/messages/${locale}/templates.json`);
+  
   const messages = {
-    common: require(`./src/i18n/messages/${locale}/common.json`),
-    templates: require(`./src/i18n/messages/${locale}/templates.json`)
+    common: commonMessages.default,
+    templates: templateMessages.default
   };
 
   return {
