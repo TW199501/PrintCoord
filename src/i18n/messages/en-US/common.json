@@ -1,15 +1,15 @@
 {
-  "brand": "Elf Admin",
-  "tagline": "Starter template for internationalized admin interfaces.",
+  "brand": "PrintCoord",
+  "tagline": "Smart table template management for PDF and Word documents.",
   "nav": {
     "home": "Home",
-    "invoice": "Invoice"
+    "invoice": "Templates"
   },
   "language": {
     "label": "Language",
     "enUS": "English",
-    "zhTW": "Traditional",
-    "zhCN": "Simplified"
+    "zhTW": "Traditional Chinese",
+    "zhCN": "Simplified Chinese"
   },
   "theme": {
     "toggle": "Toggle theme",
@@ -26,12 +26,12 @@
     "rose": "Rose"
   },
   "hero": {
-    "title": "Next.js 16 • TypeScript • Tailwind CSS • next-intl",
-    "description": "Use this scaffold to kickstart internationalized interfaces with theming controls.",
-    "cta": "Start from this template"
+    "title": "Smart table template management (PDF • Word)",
+    "description": "Upload form documents, detect fields, and manage templates with an interactive canvas.",
+    "cta": "Start designing templates"
   },
   "footer": {
-    "about": "Internationalized Next.js starter for admin experiences.",
+    "about": "PrintCoord helps you build and manage table templates for scanned PDFs and documents.",
     "rights": "All rights reserved."
   }
 }

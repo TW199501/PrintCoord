@@ -1,0 +1,130 @@
+{
+  "upload": {
+    "title": "上傳文件",
+    "description": "先上傳表格文件並確認資訊"
+  },
+  "edit": {
+    "title": "編輯欄位",
+    "description": "在畫布上調整欄位位置"
+  },
+  "preview": {
+    "title": "預覽與保存",
+    "description": "確認欄位資訊並保存模板"
+  },
+  "scan": {
+    "scanning": "掃描中...",
+    "noCanvas": "沒有可用的畫布資料，請確認文件是否為 PDF 或圖像格式。",
+    "failed": "掃描處理失敗，請確認文件格式後重試",
+    "finished": "掃描完成"
+  },
+  "stepIndicator": {
+    "step": "步驟 {number}",
+    "scanning": "掃描中...",
+    "reset": "重設流程",
+    "previous": "上一步",
+    "next": "前往下一步",
+    "complete": "完成"
+  },
+  "template": {
+    "unnamed": "未命名模板",
+    "saved": "模板保存成功！"
+  },
+  "errors": {
+    "ocrInitFailed": "OCR 引擎載入失敗，請檢查網路連線後刷新頁面。",
+    "noCanvas": "沒有可用的畫布資料，請確認文件是否為 PDF 或圖像格式。",
+    "scanFailed": "掃描處理失敗，請確認文件格式後重試"
+  },
+  "logs": {
+    "ocrReady": "OCR Service ready.",
+    "borderDetectionSuccess": "✅ 使用四邊框檢測，找到 {count} 個欄位",
+    "borderDetectionFailed": "四邊框檢測無結果，嘗試後端 PDF 解析",
+    "pdfParsingFailed": "後端 pdf2json 失敗，將改用 OCR 備援",
+    "ocrFallback": "前兩種方法都無結果，使用 OCR 備援",
+    "batchComplete": "批量處理完成"
+  },
+  "header": {
+    "brand": "PrintCoord",
+    "tagline": "智慧表格模板管理系統"
+  },
+  "footer": {
+    "about": "PrintCoord 幫助你為掃描 PDF 與文件建立並管理表格模板。",
+    "rights": "保留所有權利。",
+    "systemName": "智慧表格模板管理系統",
+    "version": "v1.0.0"
+  },
+  "workflowContent": {
+    "tabs": {
+      "single": "單個處理",
+      "batch": "批量處理"
+    },
+    "steps": {
+      "upload": {
+        "title": "步驟 1：上傳文件",
+        "description": "支援 Word / PDF"
+      }
+    },
+    "fileInfo": {
+      "title": "文件資訊",
+      "name": "檔名",
+      "status": "狀態",
+      "success": "成功",
+      "failed": "失敗",
+      "size": "大小"
+    },
+    "pdfPreview": {
+      "title": "PDF 預覽",
+      "totalPages": "共 {count} 頁",
+      "page": "第 {number} 頁",
+      "alt": "PDF 第 {number} 頁",
+      "success": "✅ PDF 文件已成功解析",
+      "nextStep": "下一步：點擊「開始掃描」進行欄位檢測"
+    },
+    "fields": {
+      "title": "偵測欄位 ({count})",
+      "list": "欄位清單"
+    },
+    "template": {
+      "settings": "模板設定",
+      "name": "模板名稱",
+      "namePlaceholder": "輸入模板名稱",
+      "description": "描述",
+      "descriptionPlaceholder": "輸入模板描述",
+      "originalFile": "原始文件：",
+      "fieldCount": "欄位數量："
+    },
+    "canvas": {
+      "batchPreview": "批量處理預覽",
+      "uploadPreview": "畫布預覽區",
+      "editArea": "畫布編輯區",
+      "batchNotice": "批量處理模式不支援畫布編輯。請於左側完成檔案設定。",
+      "ocrPreparing": "正在準備 OCR 辨識引擎...",
+      "uploadInstruction": "請先於左側上傳文件並點擊「開始掃描」。掃描完成後，畫布將顯示偵測結果。"
+    }
+  },
+  "fieldMappings": {
+    "姓名": "name",
+    "性別": "gender",
+    "性别": "gender",
+    "出生年月日": "birth_date",
+    "出生日期": "birth_date",
+    "生日": "birth_date",
+    "身分證字號": "id_number",
+    "身份证号": "id_number",
+    "電話": "phone",
+    "电话": "phone",
+    "手機": "mobile",
+    "手机": "mobile",
+    "地址": "address",
+    "住址": "address",
+    "郵遞區號": "postal_code",
+    "邮递区号": "postal_code",
+    "電子郵件": "email",
+    "申請人": "applicant",
+    "申请人": "applicant",
+    "申請單位": "applicant_unit",
+    "申请单位": "applicant_unit",
+    "單位": "unit",
+    "部門": "department",
+    "日期": "date"
+  }
+}

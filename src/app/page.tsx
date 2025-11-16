@@ -1,9 +1,6 @@
-import TemplateManager from "../TemplateManager";
+import { redirect } from 'next/navigation';
+import { defaultLocale } from '@/i18n/config';
 
-export default function HomePage() {
-  return (
-    <main className="min-h-screen">
-      <TemplateManager />
-    </main>
-  );
+export default function RootPage() {
+  redirect(`/${defaultLocale}`);
 }

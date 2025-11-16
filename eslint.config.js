@@ -18,7 +18,7 @@ module.exports = tseslint.config(
     },
   },
   {
-    files: ["**/__tests__/**/*.{ts,tsx,js}", "**/*.test.{ts,tsx,js}"],
+    files: ["**/tests/**/*.{ts,tsx,js}", "**/*.test.{ts,tsx,js}"],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -34,6 +34,37 @@ module.exports = tseslint.config(
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-require-imports": "warn",
       "@typescript-eslint/no-empty-object-type": "warn",
+    },
+  },
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector:
+            "Literal[value=/[\\u4e00-\\u9fff]/]:not(CallExpression[callee.object.name='console'] > Literal)",
+          message:
+            "UI 文案請放到 i18n messages JSON，並透過翻譯函數（例如 useTranslations）取得。",
+        },
+        // 排除 PDF 掃描相關的內容
+        {
+          selector:
+            "Literal[value=/[\\u4e00-\\u9fff]/]:matches([value=/PDF|pdf|掃描|扫描|文件|文档|表格|字段|欄位|姓名|性别|性別|出生|地址|電話|手机|手機|郵件|邮件/])",
+          message: "",
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      "src/**/*.{test,spec}.{ts,tsx}",
+      "**/tests/**/*.{ts,tsx}",
+      "src/services/**/*.{ts,tsx}",
+      "src/types/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-syntax": "off",
     },
   },
   {

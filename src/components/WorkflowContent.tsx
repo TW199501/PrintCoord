@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,6 +57,7 @@ export default function WorkflowContent({
   onTemplateConfigChange,
   onBatchComplete,
 }: WorkflowContentProps) {
+  const t = useTranslations('templates');
   const isBatchMode = activeTab === "batch";
 
   const formatFileSize = (bytes?: number): string => {
@@ -71,8 +73,8 @@ export default function WorkflowContent({
       <section className="mb-6 space-y-6 lg:mb-0">
         <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "single" | "batch")}>
           <TabsList className="grid h-11 grid-cols-2">
-            <TabsTrigger value="single">單個處理</TabsTrigger>
-            <TabsTrigger value="batch">批量處理</TabsTrigger>
+            <TabsTrigger value="single">{t('workflowContent.tabs.single')}</TabsTrigger>
+            <TabsTrigger value="batch">{t('workflowContent.tabs.batch')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="single" className="space-y-6">
@@ -80,8 +82,8 @@ export default function WorkflowContent({
             <Card className="border-t-4 border-t-pc-primary shadow-sm hover:shadow-md transition-shadow bg-pc-bg-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b border-pc-border">
                 <div>
-                  <CardTitle className="text-base">步驟 1：上傳文件</CardTitle>
-                  <p className="text-xs text-muted-foreground">支援 Word / PDF</p>
+                  <CardTitle className="text-base">{t('workflowContent.steps.upload.title')}</CardTitle>
+                  <p className="text-xs text-muted-foreground">{t('workflowContent.steps.upload.description')}</p>
                 </div>
                 <UploadIcon className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -99,23 +101,23 @@ export default function WorkflowContent({
             {uploadResult && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">文件資訊</CardTitle>
+                  <CardTitle className="text-base">{t('workflowContent.fileInfo.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">檔名</span>
+                    <span className="text-muted-foreground">{t('workflowContent.fileInfo.name')}</span>
                     <span className="font-medium">{uploadResult.file?.name ?? "—"}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">狀態</span>
+                    <span className="text-muted-foreground">{t('workflowContent.fileInfo.status')}</span>
                     <span
                       className={`font-medium ${uploadResult.success ? "text-green-600" : "text-red-600"}`}
                     >
-                      {uploadResult.success ? "成功" : (uploadResult.error ?? "失敗")}
+                      {uploadResult.success ? t('workflowContent.fileInfo.success') : (uploadResult.error ?? t('workflowContent.fileInfo.failed'))}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">大小</span>
+                    <span className="text-muted-foreground">{t('workflowContent.fileInfo.size')}</span>
                     <span>{formatFileSize(uploadResult.file?.size)}</span>
                   </div>
                 </CardContent>
@@ -135,9 +137,9 @@ export default function WorkflowContent({
             {uploadResult?.pdfPages && uploadResult.pdfPages.length > 0 && currentStep === "upload" && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">PDF 預覽</CardTitle>
+                  <CardTitle className="text-base">{t('workflowContent.pdfPreview.title')}</CardTitle>
                   <p className="text-xs text-muted-foreground">
-                    共 {uploadResult.pdfPages.length} 頁
+                    {t('workflowContent.pdfPreview.totalPages', { count: uploadResult.pdfPages.length })}
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -145,7 +147,7 @@ export default function WorkflowContent({
                     {uploadResult.pdfPages.map((page, index) => (
                       <div key={index} className="border rounded-lg overflow-hidden">
                         <div className="flex items-center justify-between p-2 bg-muted">
-                          <span className="text-xs font-medium">第 {index + 1} 頁</span>
+                          <span className="text-xs font-medium">{t('workflowContent.pdfPreview.page', { number: index + 1 })}</span>
                           <span className="text-xs text-muted-foreground">
                             {Math.round(page.canvas.width)} × {Math.round(page.canvas.height)} px
                           </span>
@@ -154,7 +156,7 @@ export default function WorkflowContent({
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={page.dataUrl}
-                            alt={`PDF 第 ${index + 1} 頁`}
+                            alt={t('workflowContent.pdfPreview.alt', { number: index + 1 })}
                             className="w-full h-auto border rounded"
                             style={{ maxHeight: "200px", objectFit: "contain" }}
                           />
@@ -163,8 +165,8 @@ export default function WorkflowContent({
                     ))}
                   </div>
                   <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700">
-                    <p>✅ PDF 文件已成功解析</p>
-                    <p>下一步：點擊「開始掃描」進行欄位檢測</p>
+                    <p>{t('workflowContent.pdfPreview.success')}</p>
+                    <p>{t('workflowContent.pdfPreview.nextStep')}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -174,7 +176,7 @@ export default function WorkflowContent({
             {fields.length > 0 && currentStep !== "edit" && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">偵測欄位 ({fields.length})</CardTitle>
+                  <CardTitle className="text-base">{t('workflowContent.fields.title', { count: fields.length })}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 max-h-48 overflow-y-auto pr-1 text-sm">
@@ -203,22 +205,22 @@ export default function WorkflowContent({
             {currentStep === "preview" && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">模板設定</CardTitle>
+                  <CardTitle className="text-base">{t('workflowContent.template.settings')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">模板名稱</label>
+                    <label className="text-sm font-medium">{t('workflowContent.template.name')}</label>
                     <input
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       value={templateConfig.name ?? ""}
                       onChange={(e) =>
                         onTemplateConfigChange({ ...templateConfig, name: e.target.value })
                       }
-                      placeholder="輸入模板名稱"
+                      placeholder={t('workflowContent.template.namePlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">描述</label>
+                    <label className="text-sm font-medium">{t('workflowContent.template.description')}</label>
                     <textarea
                       className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       value={templateConfig.description ?? ""}
@@ -228,12 +230,12 @@ export default function WorkflowContent({
                           description: e.target.value,
                         })
                       }
-                      placeholder="輸入模板描述"
+                      placeholder={t('workflowContent.template.descriptionPlaceholder')}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
-                    <div>原始文件：{uploadResult?.file?.name ?? "—"}</div>
-                    <div>欄位數量：{fields.length}</div>
+                    <div>{t('workflowContent.template.originalFile')}{uploadResult?.file?.name ?? "—"}</div>
+                    <div>{t('workflowContent.template.fieldCount')}{fields.length}</div>
                   </div>
                 </CardContent>
               </Card>
@@ -252,27 +254,27 @@ export default function WorkflowContent({
           <CardHeader className="py-3">
             <CardTitle className="text-base">
               {isBatchMode
-                ? "批量處理預覽"
+                ? t('workflowContent.canvas.batchPreview')
                 : currentStep === "upload"
-                  ? "畫布預覽區"
-                  : "畫布編輯區"}
+                  ? t('workflowContent.canvas.uploadPreview')
+                  : t('workflowContent.canvas.editArea')}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-1 items-center justify-center p-0">
             {isBatchMode ? (
               <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-6 text-center text-sm text-muted-foreground">
                 <Globe className="h-10 w-10 text-muted-foreground/70" />
-                <p>批量處理模式不支援畫布編輯。請於左側完成檔案設定。</p>
+                <p>{t('workflowContent.canvas.batchNotice')}</p>
               </div>
             ) : currentStep === "upload" ? (
               <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-6 text-center">
                 <ScanLine className="h-10 w-10 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">
                   {ocrInitializing
-                    ? "正在準備 OCR 辨識引擎..."
+                    ? t('workflowContent.canvas.ocrPreparing')
                     : ocrError
                       ? ocrError
-                      : "請先於左側上傳文件並點擊「開始掃描」。掃描完成後，畫布將顯示偵測結果。"}
+                      : t('workflowContent.canvas.uploadInstruction')}
                 </p>
                 {ocrInitializing && <Loader2 className="h-6 w-6 animate-spin" />}
               </div>
@@ -290,7 +292,7 @@ export default function WorkflowContent({
                 <aside className="w-[320px] pr-6 flex flex-col h-full">
                   <Card className="flex flex-col flex-1 overflow-hidden">
                     <CardHeader className="py-3 flex-shrink-0">
-                      <CardTitle className="text-base">欄位清單</CardTitle>
+                      <CardTitle className="text-base">{t('workflowContent.fields.list')}</CardTitle>
                     </CardHeader>
                     <CardContent className="flex-1 overflow-y-auto p-0">
                       <div className="px-6 py-4">

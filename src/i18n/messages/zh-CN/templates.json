@@ -1,0 +1,130 @@
+{
+  "upload": {
+    "title": "上传文件",
+    "description": "先上传表格文件并确认信息"
+  },
+  "edit": {
+    "title": "编辑字段",
+    "description": "在画布上调整字段位置"
+  },
+  "preview": {
+    "title": "预览与保存",
+    "description": "确认字段信息并保存模板"
+  },
+  "scan": {
+    "scanning": "扫描中...",
+    "noCanvas": "没有可用的画布数据，请确认文件是否为 PDF 或图像格式。",
+    "failed": "扫描处理失败，请确认文件格式后重试",
+    "finished": "扫描完成"
+  },
+  "stepIndicator": {
+    "step": "步骤 {number}",
+    "scanning": "扫描中...",
+    "reset": "重设流程",
+    "previous": "上一步",
+    "next": "前往下一步",
+    "complete": "完成"
+  },
+  "template": {
+    "unnamed": "未命名模板",
+    "saved": "模板保存成功！"
+  },
+  "errors": {
+    "ocrInitFailed": "OCR 引擎载入失败，请检查网络连接后刷新页面。",
+    "noCanvas": "没有可用的画布数据，请确认文件是否为 PDF 或图像格式。",
+    "scanFailed": "扫描处理失败，请确认文件格式后重试"
+  },
+  "logs": {
+    "ocrReady": "OCR Service ready.",
+    "borderDetectionSuccess": "✅ 使用四边框检测，找到 {count} 个字段",
+    "borderDetectionFailed": "四边框检测无结果，尝试后端 PDF 解析",
+    "pdfParsingFailed": "后端 pdf2json 失败，将改用 OCR 备援",
+    "ocrFallback": "前两种方法都无结果，使用 OCR 备援",
+    "batchComplete": "批量处理完成"
+  },
+  "header": {
+    "brand": "PrintCoord",
+    "tagline": "智慧表格模板管理系统"
+  },
+  "footer": {
+    "about": "PrintCoord 帮助你为扫描 PDF 与文档建立并管理表格模板。",
+    "rights": "保留所有权利。",
+    "systemName": "智慧表格模板管理系统",
+    "version": "v1.0.0"
+  },
+  "workflowContent": {
+    "tabs": {
+      "single": "单个处理",
+      "batch": "批量处理"
+    },
+    "steps": {
+      "upload": {
+        "title": "步骤 1：上传文件",
+        "description": "支持 Word / PDF"
+      }
+    },
+    "fileInfo": {
+      "title": "文件信息",
+      "name": "文件名",
+      "status": "状态",
+      "success": "成功",
+      "failed": "失败",
+      "size": "大小"
+    },
+    "pdfPreview": {
+      "title": "PDF 预览",
+      "totalPages": "共 {count} 页",
+      "page": "第 {number} 页",
+      "alt": "PDF 第 {number} 页",
+      "success": "✅ PDF 文件已成功解析",
+      "nextStep": "下一步：点击「开始扫描」进行字段检测"
+    },
+    "fields": {
+      "title": "检测字段 ({count})",
+      "list": "字段清单"
+    },
+    "template": {
+      "settings": "模板设置",
+      "name": "模板名称",
+      "namePlaceholder": "输入模板名称",
+      "description": "描述",
+      "descriptionPlaceholder": "输入模板描述",
+      "originalFile": "原始文件：",
+      "fieldCount": "字段数量："
+    },
+    "canvas": {
+      "batchPreview": "批量处理预览",
+      "uploadPreview": "画布预览区",
+      "editArea": "画布编辑区",
+      "batchNotice": "批量处理模式不支持画布编辑。请于左侧完成档案设定。",
+      "ocrPreparing": "正在准备 OCR 辨识引擎...",
+      "uploadInstruction": "请先于左侧上传文件并点击「开始扫描」。扫描完成后，画布将显示检测结果。"
+    }
+  },
+  "fieldMappings": {
+    "姓名": "name",
+    "性別": "gender",
+    "性别": "gender",
+    "出生年月日": "birth_date",
+    "出生日期": "birth_date",
+    "生日": "birth_date",
+    "身分證字號": "id_number",
+    "身份证号": "id_number",
+    "電話": "phone",
+    "电话": "phone",
+    "手機": "mobile",
+    "手机": "mobile",
+    "地址": "address",
+    "住址": "address",
+    "郵遞區號": "postal_code",
+    "邮递区号": "postal_code",
+    "電子郵件": "email",
+    "申請人": "applicant",
+    "申请人": "applicant",
+    "申請單位": "applicant_unit",
+    "申请单位": "applicant_unit",
+    "單位": "unit",
+    "部門": "department",
+    "日期": "date"
+  }
+}

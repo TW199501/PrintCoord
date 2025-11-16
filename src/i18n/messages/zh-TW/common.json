@@ -1,9 +1,9 @@
 {
-  "brand": "Elf Admin",
-  "tagline": "提供團隊使用的國際化管理後台模板。",
+  "brand": "PrintCoord",
+  "tagline": "智慧表格模板管理系統，支援 PDF / Word 表單文件。",
   "nav": {
     "home": "首頁",
-    "invoice": "發票"
+    "invoice": "模板"
   },
   "language": {
     "label": "語言",
@@ -26,12 +26,12 @@
     "rose": "玫瑰"
   },
   "hero": {
-    "title": "Next.js 16 • TypeScript • Tailwind CSS • next-intl",
-    "description": "使用此模板快速建立具備國際化與主題控制的介面骨架。",
-    "cta": "開始使用模板"
+    "title": "智慧表格模板管理（PDF • Word）",
+    "description": "上傳表格文件、偵測欄位，並在互動畫布上調整與管理模板。",
+    "cta": "開始設計模板"
   },
   "footer": {
-    "about": "為國際化管理介面打造的 Next.js 起始模板。",
+    "about": "PrintCoord 幫助你為掃描 PDF 與文件建立並管理表格模板。",
     "rights": "保留所有權利。"
   }
 }

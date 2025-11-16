@@ -1,0 +1,130 @@
+{
+  "upload": {
+    "title": "Upload File",
+    "description": "Upload a table file and confirm details first"
+  },
+  "edit": {
+    "title": "Edit Fields",
+    "description": "Adjust field positions on the canvas"
+  },
+  "preview": {
+    "title": "Preview & Save",
+    "description": "Confirm field information and save template"
+  },
+  "scan": {
+    "scanning": "Scanning...",
+    "noCanvas": "No available canvas data, please confirm the file is PDF or image format.",
+    "failed": "Scanning failed, please confirm file format and try again",
+    "finished": "Scan completed"
+  },
+  "stepIndicator": {
+    "step": "Step {number}",
+    "scanning": "Scanning...",
+    "reset": "Reset Process",
+    "previous": "Previous Step",
+    "next": "Go to Next Step",
+    "complete": "Complete"
+  },
+  "template": {
+    "unnamed": "Unnamed Template",
+    "saved": "Template saved successfully!"
+  },
+  "errors": {
+    "ocrInitFailed": "OCR engine failed to load, please check network connection and refresh the page.",
+    "noCanvas": "No available canvas data, please confirm the file is PDF or image format.",
+    "scanFailed": "Scanning failed, please confirm file format and try again"
+  },
+  "logs": {
+    "ocrReady": "OCR Service ready.",
+    "borderDetectionSuccess": "Using border detection, found {count} fields",
+    "borderDetectionFailed": "Border detection failed, trying PDF parsing",
+    "pdfParsingFailed": "PDF parsing failed, using OCR fallback",
+    "ocrFallback": "Previous methods failed, using OCR fallback",
+    "batchComplete": "Batch processing completed"
+  },
+  "header": {
+    "brand": "PrintCoord",
+    "tagline": "Smart table template management system"
+  },
+  "footer": {
+    "about": "PrintCoord helps you build and manage table templates for scanned PDFs and documents.",
+    "rights": "All rights reserved.",
+    "systemName": "Smart table template management system",
+    "version": "v1.0.0"
+  },
+  "workflowContent": {
+    "tabs": {
+      "single": "Single Processing",
+      "batch": "Batch Processing"
+    },
+    "steps": {
+      "upload": {
+        "title": "Step 1: Upload File",
+        "description": "Supports Word / PDF"
+      }
+    },
+    "fileInfo": {
+      "title": "File Information",
+      "name": "Filename",
+      "status": "Status",
+      "success": "Success",
+      "failed": "Failed",
+      "size": "Size"
+    },
+    "pdfPreview": {
+      "title": "PDF Preview",
+      "totalPages": "Total {count} pages",
+      "page": "Page {number}",
+      "alt": "PDF page {number}",
+      "success": "PDF file successfully parsed",
+      "nextStep": "Next step: Click 'Start scanning' to perform field detection"
+    },
+    "fields": {
+      "title": "Detected Fields ({count})",
+      "list": "Field List"
+    },
+    "template": {
+      "settings": "Template Settings",
+      "name": "Template Name",
+      "namePlaceholder": "Enter template name",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter template description",
+      "originalFile": "Original file:",
+      "fieldCount": "Number of fields:"
+    },
+    "canvas": {
+      "batchPreview": "Batch Processing Preview",
+      "uploadPreview": "Canvas Preview Area",
+      "editArea": "Canvas Editing Area",
+      "batchNotice": "Batch processing mode does not support canvas editing. Please complete file settings on the left.",
+      "ocrPreparing": "Preparing OCR recognition engine...",
+      "uploadInstruction": "Please first upload the file on the left and click 'Start scanning'. After scanning, the canvas will show detection results."
+    }
+  },
+  "fieldMappings": {
+    "姓名": "name",
+    "性別": "gender",
+    "性别": "gender",
+    "出生年月日": "birth_date",
+    "出生日期": "birth_date",
+    "生日": "birth_date",
+    "身分證字號": "id_number",
+    "身份证号": "id_number",
+    "電話": "phone",
+    "电话": "phone",
+    "手機": "mobile",
+    "手机": "mobile",
+    "地址": "address",
+    "住址": "address",
+    "郵遞區號": "postal_code",
+    "邮递区号": "postal_code",
+    "電子郵件": "email",
+    "申請人": "applicant",
+    "申请人": "applicant",
+    "申請單位": "applicant_unit",
+    "申请单位": "applicant_unit",
+    "單位": "unit",
+    "部門": "department",
+    "日期": "date"
+  }
+}

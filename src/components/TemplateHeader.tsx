@@ -7,9 +7,11 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { Moon, Sun, Grid3x3 } from "lucide-react";
+import ReactCountryFlag from "react-country-flag";
+import { useTranslations } from "next-intl";
+import { useRouter, usePathname } from "@/i18n/navigation";
 
 interface TemplateHeaderProps {
   language: string;
@@ -24,6 +26,15 @@ export default function TemplateHeader({
   isDarkMode,
   onThemeToggle,
 }: TemplateHeaderProps) {
+  const t = useTranslations('common');
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleLanguageChange = (value: string) => {
+    onLanguageChange(value);
+    const newPath = `/${value}${pathname}`;
+    router.push(newPath);
+  };
   return (
     <>
       {/* 頂部 Header - PrintCoord 品牌色 */}
@@ -38,24 +49,59 @@ export default function TemplateHeader({
           </div>
           <div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-pc-primary to-pc-secondary bg-clip-text text-transparent">
-              PrintCoord
+              {t('brand')}
             </h1>
             <p className="text-xs text-pc-text-muted font-medium">
-              智慧表格模板管理系統
+              {t('tagline')}
             </p>
           </div>
         </div>
         <div className="flex flex-1 justify-center" aria-hidden="true" />
 
         <div className="flex items-center gap-3">
-          <Select value={language} onValueChange={onLanguageChange}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
+          <Select value={language} onValueChange={handleLanguageChange}>
+            <SelectTrigger className="w-32 justify-center px-2">
+              <span className="flex items-center gap-1 text-sm">
+                <span className="leading-none">
+                  {language === "en-US" && (
+                    <ReactCountryFlag
+                      countryCode="US"
+                      svg
+                      style={{ width: "1.1em", height: "1.1em" }}
+                    />
+                  )}
+                  {language === "zh-TW" && (
+                    <ReactCountryFlag
+                      countryCode="TW"
+                      svg
+                      style={{ width: "1.1em", height: "1.1em" }}
+                    />
+                  )}
+                  {language === "zh-CN" && (
+                    <ReactCountryFlag
+                      countryCode="CN"
+                      svg
+                      style={{ width: "1.1em", height: "1.1em" }}
+                    />
+                  )}
+                </span>
+                <span className="font-medium tracking-tight">
+                  {language === "en-US" && "US"}
+                  {language === "zh-TW" && "TW"}
+                  {language === "zh-CN" && "CN"}
+                </span>
+              </span>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="zh-TW">繁體中文</SelectItem>
-              <SelectItem value="zh-CN">简体中文</SelectItem>
-              <SelectItem value="en">English</SelectItem>
+            <SelectContent className="w-32">
+              <SelectItem value="zh-TW" className="py-1 px-2 text-sm">
+                {t('language.zhTW')}
+              </SelectItem>
+              <SelectItem value="zh-CN" className="py-1 px-2 text-sm">
+                {t('language.zhCN')}
+              </SelectItem>
+              <SelectItem value="en-US" className="py-1 px-2 text-sm">
+                {t('language.enUS')}
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -63,7 +109,7 @@ export default function TemplateHeader({
             variant="ghost"
             size="icon"
             onClick={onThemeToggle}
-            aria-label="切換主題"
+            aria-label={t('theme.toggle')}
           >
             {isDarkMode ? (
               <Sun className="h-4 w-4" />

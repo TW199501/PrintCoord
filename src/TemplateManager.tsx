@@ -17,26 +17,21 @@ import { SmartSuggestionsService } from "@/services/smartSuggestions";
 import { UserBehaviorTracker } from "@/services/userBehaviorTracker";
 import { FieldDetectionService } from "@/services/fieldDetection";
 import { OCRService } from "@/services/ocrService";
+import { useTranslations } from "next-intl";
 
 type WorkflowStep = "upload" | "edit" | "preview";
 
-const STEP_COPY: Record<WorkflowStep, { title: string; description: string }> =
-  {
-    upload: { title: "上傳文件", description: "先上傳表格文件並確認資訊" },
-    edit: { title: "編輯欄位", description: "在畫布上調整欄位位置" },
-    preview: { title: "預覽與保存", description: "確認欄位資訊並保存模板" },
-  };
-
 const LANGUAGES = [
-  { value: "zh-TW", label: "繁體中文" },
   { value: "en-US", label: "English" },
-  { value: "ja-JP", label: "日本語" },
-  { value: "de-DE", label: "Deutsch" },
+  { value: "zh-TW", label: "繁體中文" },
+  { value: "zh-CN", label: "简体中文" },
 ];
 
 export default function TemplateManager() {
   const [currentStep, setCurrentStep] = useState<WorkflowStep>("upload");
   const [activeTab, setActiveTab] = useState<"single" | "batch">("single");
+  const t = useTranslations('templates');
+  const fieldMappings = t.raw('fieldMappings') as Record<string, string>;
   const [uploadResult, setUploadResult] = useState<FileUploadResult | null>(
     null,
   );
@@ -58,7 +53,13 @@ export default function TemplateManager() {
   const [uploadSession, setUploadSession] = useState(0);
   const scanTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 初始化服務
+  // Get translated step details
+  const getTranslatedStep = (step: WorkflowStep) => ({
+    title: t(`${step}.title`),
+    description: t(`${step}.description`),
+  });
+
+  // Initialize services
   useEffect(() => {
     SmartSuggestionsService.initialize();
     UserBehaviorTracker.initialize();
@@ -67,16 +68,16 @@ export default function TemplateManager() {
     OCRService.initialize()
       .then(() => {
         setOcrInitializing(false);
-        console.log("OCR Service ready.");
+        console.log(t('logs.ocrReady'));
       })
       .catch(error => {
         console.error("OCR Initialization failed:", error);
-        setOcrError("OCR 引擎載入失敗，請檢查網路連線後刷新頁面。");
+        setOcrError(t('errors.ocrInitFailed'));
         setOcrInitializing(false);
       });
 
     return () => {
-      // OCRService.terminate(); // 根據需求決定是否在組件卸載時終止
+      // Terminate OCR service when component unmounts (decide based on requirements)
     };
   }, []);
 
@@ -146,20 +147,20 @@ export default function TemplateManager() {
     }));
   };
 
-  // 依照「由上到下、每行由左到右」排序欄位
-  // 以 yTolerance 判定同一行（可微調以適配不同 DPI/縮放）
+  // Sort fields from top to bottom, left to right within each row
+  // Use yTolerance to determine same row (adjustable for different DPI/scaling)
   const sortFieldsByRowAndX = (
     list: FieldArea[],
     yTolerance: number = 16,
   ): FieldArea[] => {
     if (!list || list.length === 0) return list;
 
-    // 先依 y 由小到大排序（取框的頂部 y）
+    // Sort by y from small to large (take the top y of the box)
     const sortedByY = [...list].sort(
       (a, b) => a.position.y - b.position.y,
     );
 
-    // 逐一放入行群組
+    // Group into rows one by one
     const rows: FieldArea[][] = [];
     for (const item of sortedByY) {
       const yTop = item.position.y;
@@ -173,7 +174,7 @@ export default function TemplateManager() {
       }
     }
 
-    // 每一行內依 x 由小到大排序，最後再扁平化
+    // Sort by x from left to right within each row, then flatten
     const flattened: FieldArea[] = [];
     for (const row of rows) {
       row.sort((a, b) => a.position.x - b.position.x);
@@ -195,32 +196,7 @@ export default function TemplateManager() {
 
     const mergedWords = OCRService.mergeNearbyTextRegions(words, 28);
 
-    const zhToEn: Record<string, string> = {
-      姓名: "name",
-      性別: "gender",
-      性别: "gender",
-      出生年月日: "birth_date",
-      出生日期: "birth_date",
-      生日: "birth_date",
-      身分證字號: "id_number",
-      身份证号: "id_number",
-      電話: "phone",
-      电话: "phone",
-      手機: "mobile",
-      手机: "mobile",
-      地址: "address",
-      住址: "address",
-      郵遞區號: "postal_code",
-      邮递区号: "postal_code",
-      電子郵件: "email",
-      申請人: "applicant",
-      申请人: "applicant",
-      申請單位: "applicant_unit",
-      申请单位: "applicant_unit",
-      單位: "unit",
-      部門: "department",
-      日期: "date",
-    };
+    const zhToEn: Record<string, string> = fieldMappings;
 
     const normalizeToSnake = (raw: string, fallback: string): string => {
       // direct zh mapping
@@ -252,7 +228,7 @@ export default function TemplateManager() {
         const wRight = wx + ww;
         const wCenterY = wy + wh / 2;
 
-        // 左側同一行
+        // Left side same row
         if (wRight <= fx && Math.abs(wCenterY - fCenterY) <= yTolerance) {
           const dist = fx - wRight;
           if (dist <= maxXDistance && dist < bestDist) {
@@ -262,9 +238,9 @@ export default function TemplateManager() {
           continue;
         }
 
-        // 上方標籤：在欄位頂部之上，水平有重疊或靠近
+        // Upper label: above the field top, with horizontal overlap or proximity
         const wBottom = wy + wh;
-        const verticalGap = fy - wBottom; // >0 表示在上方
+        const verticalGap = fy - wBottom; // >0 means above
         const fieldRight = fx + f.size.width;
         const overlap = Math.min(fieldRight, wRight) - Math.max(fx, wx);
         const horizontalNear = overlap > 0 || Math.abs((wx + ww / 2) - (fx + f.size.width / 2)) <= 140;
@@ -277,7 +253,7 @@ export default function TemplateManager() {
         }
       }
 
-      // 右側小距離（少數表格標籤在右邊）
+      // Small right distance (rare cases where table labels are on the right)
       if (!bestLabel) {
         for (const w of mergedWords) {
           const wx = w.bbox[0];
@@ -301,7 +277,7 @@ export default function TemplateManager() {
           return { ...f, name: normalizeToSnake(cleaned, `field_${idx + 1}`) };
         }
       }
-      // 再嘗試以欄位框內的文字作為名稱候選（多為 placeholder）
+      // Also try to use text inside the field box as name candidates (mostly placeholders)
       const inBox = mergedWords
         .filter((w) => {
           const wx = w.bbox[0];
@@ -324,8 +300,8 @@ export default function TemplateManager() {
   };
 
   const handleBatchComplete = (results: BatchProcessItem[]) => {
-    console.log("批量處理完成:", results);
-    // 可以這裡添加批量結果的後續處理
+    console.log(t('logs.batchComplete'), results);
+    // Can add subsequent processing for batch results here
   };
 
   const handleSaveTemplate = () => {
@@ -343,11 +319,11 @@ export default function TemplateManager() {
 
     const config: TemplateConfig = {
       id: `template_${Date.now()}`,
-      name: templateConfig.name || "未命名模板",
+      name: templateConfig.name || t('template.unnamed'),
       description: templateConfig.description,
       originalFileName: uploadResult.file.name,
       fileType,
-      pageSize: { width: 800, height: 600 }, // 預設大小
+      pageSize: { width: 800, height: 600 }, // Default size
       fields,
       createdAt: templateConfig.createdAt || new Date(),
       updatedAt: new Date(),
@@ -359,7 +335,7 @@ export default function TemplateManager() {
     templates.push(config);
     localStorage.setItem("tableTemplates", JSON.stringify(templates));
 
-    alert("模板保存成功！");
+    alert(t('template.saved'));
     handleResetWorkflow();
   };
 
@@ -414,22 +390,22 @@ export default function TemplateManager() {
       }
 
       if (!workingCanvas) {
-        throw new Error("沒有可用的畫布資料，請確認文件是否為 PDF 或圖像格式。");
+        throw new Error(t('errors.noCanvas'));
       }
 
-      // 1) 優先使用新的四邊框檢測（更準確）
+      // 1) Prefer using new border detection (more accurate)
       let finalFields: FieldArea[] = [];
       
-      // 先嘗試使用新的圖像檢測方法（檢測四邊框）
+      // First try using new image detection method (detect borders)
       const imageEl = new Image();
       imageEl.src = workingCanvas.toDataURL();
       await new Promise((resolve) => {
         imageEl.onload = resolve;
       });
       
-      // 傳入目標顯示尺寸（A4 標準尺寸）來計算縮放比例
-      const targetWidth = 794;  // A4 寬度
-      const targetHeight = 1123; // A4 高度
+      // Pass target display size (A4 standard size) to calculate scaling ratio
+      const targetWidth = 794;  // A4 width
+      const targetHeight = 1123; // A4 height
       const detectedFields = await FieldDetectionService.detectFieldsFromImage(
         imageEl,
         targetWidth,
@@ -437,14 +413,14 @@ export default function TemplateManager() {
       );
       
       if (detectedFields.length > 0) {
-        console.log(`✅ 使用四邊框檢測，找到 ${detectedFields.length} 個欄位`);
+        console.log(t('logs.borderDetectionSuccess', { count: detectedFields.length }));
         finalFields = sortFieldsByRowAndX(detectedFields);
       }
       
-      // 2) 如果四邊框檢測沒有結果，嘗試後端 pdf2json
+      // 2) If border detection has no results, try backend pdf2json
       if (finalFields.length === 0 && uploadResult.file) {
         try {
-          console.log('四邊框檢測無結果，嘗試後端 PDF 解析');
+          console.log(t('logs.borderDetectionFailed'));
           const form = new FormData();
           form.append("file", uploadResult.file);
           const resp = await fetch("/api/pdf", { method: "POST", body: form });
@@ -452,15 +428,15 @@ export default function TemplateManager() {
             const json = await resp.json();
             const apiFields: FieldArea[] = json?.data?.fields || [];
             if (Array.isArray(apiFields) && apiFields.length > 1) {
-              // 先排序
+              // First sort
               let ordered = sortFieldsByRowAndX(apiFields);
-              // 若名稱看起來是預設（以 "Cell " 開頭或空白），用 OCR 單詞做自動命名
+              // If names look like defaults (starting with "Cell " or blank), use OCR words for auto naming
               const needsNaming = ordered.some(f => !f.name || /^Cell\b/.test(f.name));
               if (needsNaming) {
                 const ocrLayoutForNames = await OCRService.extractTextAndLayout(workingCanvas);
                 ordered = autoNameFieldsFromWords(ordered, ocrLayoutForNames.words);
               }
-              // 全量正規化為 snake_case
+              // Normalize all to snake_case
               finalFields = ordered.map((f, i) => ({
                 ...f,
                 name: f.name
@@ -475,13 +451,13 @@ export default function TemplateManager() {
             }
           }
         } catch (e) {
-          console.warn("後端 pdf2json 失敗，將改用 OCR 備援", e);
+          console.warn(t('logs.pdfParsingFailed'), e);
         }
       }
 
-      // 3) 最後才用 OCR 備援
+      // 3) Finally use OCR fallback
       if (finalFields.length === 0) {
-        console.log('前兩種方法都無結果，使用 OCR 備援');
+        console.log(t('logs.ocrFallback'));
         const ocrLayout = await OCRService.extractTextAndLayout(workingCanvas);
         const ocrFields = await FieldDetectionService.detectFieldsFromLayout(
           ocrLayout,
@@ -509,7 +485,7 @@ export default function TemplateManager() {
       setScanError(
         error instanceof Error
           ? error.message
-          : "掃描處理失敗，請確認文件格式後重試",
+          : t('errors.scanFailed'),
       );
       setIsScanning(false);
     }
@@ -560,7 +536,7 @@ export default function TemplateManager() {
     return Boolean(templateConfig.name?.trim());
   })();
 
-  const stepDetails = STEP_COPY[currentStep];
+  const stepDetails = getTranslatedStep(currentStep);
   const hasFile = Boolean(uploadResult?.file);
 
   return (

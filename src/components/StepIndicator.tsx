@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
@@ -35,6 +36,7 @@ export default function StepIndicator({
   onNext,
   canProceed,
 }: StepIndicatorProps) {
+  const t = useTranslations('templates');
   const stepNumber =
     currentStep === "upload" ? "01" : currentStep === "edit" ? "02" : "03";
 
@@ -58,7 +60,7 @@ export default function StepIndicator({
           variant="outline"
           className="px-3 py-1 text-xs uppercase tracking-wide bg-pc-accent text-white border-0 shadow-sm font-semibold"
         >
-          Step {stepNumber}
+          {t('stepIndicator.step', { number: stepNumber })}
         </Badge>
         <div>
           <p className="text-sm font-medium">{stepDetails.title}</p>
@@ -69,7 +71,7 @@ export default function StepIndicator({
         {isScanning && (
           <div className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            掃描中...
+            {t('stepIndicator.scanning')}
           </div>
         )}
       </div>
@@ -80,7 +82,7 @@ export default function StepIndicator({
           disabled={!hasFile && fieldsCount === 0 && !templateName}
           onClick={onReset}
         >
-          重設流程
+          {t('stepIndicator.reset')}
         </Button>
         <div className="flex items-center gap-2">
           <Button
@@ -88,14 +90,14 @@ export default function StepIndicator({
             disabled={currentStep === "upload"}
             onClick={onPrevious}
           >
-            上一步
+            {t('stepIndicator.previous')}
           </Button>
           <Button 
             disabled={!canProceed} 
             onClick={onNext}
             className="bg-gradient-to-r from-pc-primary to-pc-secondary hover:from-pc-primary-dark hover:to-pc-secondary text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
           >
-            {currentStep === "preview" ? "完成" : "前往下一步"}
+            {currentStep === "preview" ? t('stepIndicator.complete') : t('stepIndicator.next')}
           </Button>
         </div>
       </div>

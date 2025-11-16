@@ -1,15 +1,13 @@
 {
   "name": "@tabletemplate/pro",
-  "version": "1.0.0",
+  "version": "1.0.10",
   "description": "PrintCoord - 智慧表格模板管理系統",
-  "main": "index.ts",
-  "module": "index.ts",
-  "types": "index.ts",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "clean": "powershell -Command \"Remove-Item -Recurse -Force .next, .turbo -ErrorAction SilentlyContinue\"",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:js": "eslint \"**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
@@ -52,6 +50,8 @@
     "lucide-react": "^0.460.0",
     "mammoth": "^1.11.0",
     "next": "^16.0.1",
+    "next-intl": "^4.5.3",
+    "react-country-flag": "^3.1.0",
     "pdf-parse": "^2.4.5",
     "pdf.js-extract": "^0.2.1",
     "pdf2json": "^4.0.0",
@@ -88,21 +88,6 @@
     "typescript": "^5.2.3",
     "typescript-eslint": "^8.46.4"
   },
-  "files": [
-    "components/",
-    "services/",
-    "types/",
-    "index.ts",
-    "README.md"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/your-org/tabletemplate-pro.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-org/tabletemplate-pro/issues"
-  },
-  "homepage": "https://github.com/your-org/tabletemplate-pro#readme",
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=8.0.0"
