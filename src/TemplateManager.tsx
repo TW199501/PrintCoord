@@ -17,7 +17,7 @@ import { SmartSuggestionsService } from "@/services/smartSuggestions";
 import { UserBehaviorTracker } from "@/services/userBehaviorTracker";
 import { FieldDetectionService } from "@/services/fieldDetection";
 import { OCRService } from "@/services/ocrService";
-import { useTranslations } from "next-intl";
+// import { useTranslations } from "next-intl";
 
 type WorkflowStep = "upload" | "edit" | "preview";
 
@@ -30,8 +30,8 @@ const LANGUAGES = [
 export default function TemplateManager() {
   const [currentStep, setCurrentStep] = useState<WorkflowStep>("upload");
   const [activeTab, setActiveTab] = useState<"single" | "batch">("single");
-  const t = useTranslations('templates');
-  const fieldMappings = t.raw('fieldMappings') as Record<string, string>;
+  // const t = useTranslations('templates');
+  const fieldMappings = {}; // Temporarily disabled
   const [uploadResult, setUploadResult] = useState<FileUploadResult | null>(
     null,
   );
@@ -55,8 +55,8 @@ export default function TemplateManager() {
 
   // Get translated step details
   const getTranslatedStep = (step: WorkflowStep) => ({
-    title: t(`${step}.title`),
-    description: t(`${step}.description`),
+    title: `${step} Step`, // t(`${step}.title`)
+    description: `Step description for ${step}`, // t(`${step}.description`)
   });
 
   // Initialize services
@@ -68,11 +68,11 @@ export default function TemplateManager() {
     OCRService.initialize()
       .then(() => {
         setOcrInitializing(false);
-        console.log(t('logs.ocrReady'));
+        console.log("OCR Service ready"); // t('logs.ocrReady')
       })
       .catch(error => {
         console.error("OCR Initialization failed:", error);
-        setOcrError(t('errors.ocrInitFailed'));
+        setOcrError("OCR engine failed to load"); // t('errors.ocrInitFailed')
         setOcrInitializing(false);
       });
 
@@ -300,7 +300,7 @@ export default function TemplateManager() {
   };
 
   const handleBatchComplete = (results: BatchProcessItem[]) => {
-    console.log(t('logs.batchComplete'), results);
+    console.log("Batch processing completed", results); // t('logs.batchComplete'), results
     // Can add subsequent processing for batch results here
   };
 
@@ -319,7 +319,7 @@ export default function TemplateManager() {
 
     const config: TemplateConfig = {
       id: `template_${Date.now()}`,
-      name: templateConfig.name || t('template.unnamed'),
+      name: templateConfig.name || "Unnamed Template", // t('template.unnamed')
       description: templateConfig.description,
       originalFileName: uploadResult.file.name,
       fileType,
@@ -335,7 +335,7 @@ export default function TemplateManager() {
     templates.push(config);
     localStorage.setItem("tableTemplates", JSON.stringify(templates));
 
-    alert(t('template.saved'));
+    alert("Template saved successfully!"); // t('template.saved')
     handleResetWorkflow();
   };
 
@@ -390,7 +390,7 @@ export default function TemplateManager() {
       }
 
       if (!workingCanvas) {
-        throw new Error(t('errors.noCanvas'));
+        throw new Error("No available canvas data"); // t('errors.noCanvas')
       }
 
       // 1) Prefer using new border detection (more accurate)
@@ -413,14 +413,14 @@ export default function TemplateManager() {
       );
       
       if (detectedFields.length > 0) {
-        console.log(t('logs.borderDetectionSuccess', { count: detectedFields.length }));
+        console.log("Using border detection, found fields", { count: detectedFields.length }); // t('logs.borderDetectionSuccess', { count: detectedFields.length })
         finalFields = sortFieldsByRowAndX(detectedFields);
       }
       
       // 2) If border detection has no results, try backend pdf2json
       if (finalFields.length === 0 && uploadResult.file) {
         try {
-          console.log(t('logs.borderDetectionFailed'));
+          console.log("Border detection failed, trying PDF parsing"); // t('logs.borderDetectionFailed')
           const form = new FormData();
           form.append("file", uploadResult.file);
           const resp = await fetch("/api/pdf", { method: "POST", body: form });
@@ -451,13 +451,13 @@ export default function TemplateManager() {
             }
           }
         } catch (e) {
-          console.warn(t('logs.pdfParsingFailed'), e);
+          console.warn("PDF parsing failed", e); // t('logs.pdfParsingFailed'), e
         }
       }
 
       // 3) Finally use OCR fallback
       if (finalFields.length === 0) {
-        console.log(t('logs.ocrFallback'));
+        console.log("Previous methods failed, using OCR fallback"); // t('logs.ocrFallback')
         const ocrLayout = await OCRService.extractTextAndLayout(workingCanvas);
         const ocrFields = await FieldDetectionService.detectFieldsFromLayout(
           ocrLayout,
@@ -485,7 +485,7 @@ export default function TemplateManager() {
       setScanError(
         error instanceof Error
           ? error.message
-          : t('errors.scanFailed'),
+          : "Scanning failed", // t('errors.scanFailed')
       );
       setIsScanning(false);
     }
