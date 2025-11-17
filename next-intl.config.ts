@@ -1,23 +1,45 @@
-import { getRequestConfig } from 'next-intl/server';
-import { locales, defaultLocale } from './src/i18n/config';
+import { locales, defaultLocale, type Locale } from "./src/i18n/config";
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  // 確認請求的語言是否存在，否則使用預設語言
-  const locale = locales.includes(requestLocale as any) 
-    ? requestLocale 
-    : defaultLocale;
+export const locales = locales;
+export const defaultLocale = defaultLocale;
 
-  // 動態載入對應語言的訊息文件
-  const commonMessages = await import(`./src/i18n/messages/${locale}/common.json`);
-  const templateMessages = await import(`./src/i18n/messages/${locale}/templates.json`);
-  
-  const messages = {
-    common: commonMessages.default,
-    templates: templateMessages.default
-  };
+export async function getMessages(locale: Locale) {
+  try {
+    // 載入指定語言的所有消息文件
+    const commonMessages = (
+      await import(`./src/i18n/messages/${locale}/common.json`)
+    ).default;
+    const templateMessages = (
+      await import(`./src/i18n/messages/${locale}/templates.json`)
+    ).default;
 
-  return {
-    locale,
-    messages
-  };
-});
+    return {
+      ...commonMessages,
+      ...templateMessages,
+    };
+  } catch (error) {
+    console.error(`Failed to load messages for locale ${locale}:`, error);
+    
+    // 如果載入失敗，嘗試使用預設語言
+    if (locale !== defaultLocale) {
+      try {
+        const commonMessages = (
+          await import(`./src/i18n/messages/${defaultLocale}/common.json`)
+        ).default;
+        const templateMessages = (
+          await import(`./src/i18n/messages/${defaultLocale}/templates.json`)
+        ).default;
+
+        return {
+          ...commonMessages,
+          ...templateMessages,
+        };
+      } catch (defaultError) {
+        console.error(`Failed to load default messages:`, defaultError);
+      }
+    }
+
+    // 如果所有嘗試都失敗，返回空的訊息對象
+    return {};
+  }
+}

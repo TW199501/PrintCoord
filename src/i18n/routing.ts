@@ -6,3 +6,6 @@ export const routing = defineRouting({
   defaultLocale,
   localePrefix,
 });
+
+// 確保導出類型
+export type Routing = typeof routing;

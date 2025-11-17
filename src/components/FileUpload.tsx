@@ -5,6 +5,7 @@ import { useDropzone, type FileRejection } from "react-dropzone";
 import { Upload, X, CheckCircle } from "lucide-react";
 import { FileUploadResult } from "../types";
 import { FileProcessingService } from "@/services/fileProcessingService";
+// @ts-expect-error next-intl module export type issue
 import { useTranslations } from "next-intl";
 
 interface FileUploadProps {

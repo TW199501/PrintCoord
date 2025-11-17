@@ -1,6 +1,20 @@
 import { UserBehaviorTracker } from "@/services/userBehaviorTracker";
 import { FieldType } from "@/types";
 
+// 定義更具體的類型來替代 any
+interface UserBehaviorTrackerWithPrivate extends UserBehaviorTracker {
+  actions: Array<{ action: string; timestamp: Date; data: unknown }>;
+  fieldChoices: Array<{
+    text: string;
+    context: string[];
+    suggestedType: FieldType;
+    chosenType: FieldType;
+    accepted: boolean;
+    confidence?: number;
+    responseTime?: number;
+  }>;
+}
+
 // Mock localStorage
 const localStorageMock = {
   getItem: jest.fn(),
@@ -17,8 +31,11 @@ describe("UserBehaviorTracker", () => {
   beforeEach(() => {
     // Clear all instances and mocks
     jest.clearAllMocks();
-    (UserBehaviorTracker as any).actions = [];
-    (UserBehaviorTracker as any).fieldChoices = [];
+    (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate).actions =
+      [];
+    (
+      UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate
+    ).fieldChoices = [];
   });
 
   describe("initialize", () => {
@@ -64,8 +81,14 @@ describe("UserBehaviorTracker", () => {
       UserBehaviorTracker.initialize();
 
       // Should not throw and should initialize empty arrays
-      expect((UserBehaviorTracker as any).actions).toEqual([]);
-      expect((UserBehaviorTracker as any).fieldChoices).toEqual([]);
+      expect(
+        (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate)
+          .actions
+      ).toEqual([]);
+      expect(
+        (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate)
+          .fieldChoices
+      ).toEqual([]);
     });
   });
 
@@ -85,8 +108,13 @@ describe("UserBehaviorTracker", () => {
         responseTime
       );
 
-      expect((UserBehaviorTracker as any).fieldChoices).toHaveLength(1);
-      const choice = (UserBehaviorTracker as any).fieldChoices[0];
+      expect(
+        (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate)
+          .fieldChoices
+      ).toHaveLength(1);
+      const choice = (
+        UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate
+      ).fieldChoices[0];
       expect(choice.text).toBe(text);
       expect(choice.context).toEqual(context);
       expect(choice.suggestedType).toBe(suggestedType);
@@ -106,7 +134,10 @@ describe("UserBehaviorTracker", () => {
         );
       }
 
-      expect((UserBehaviorTracker as any).fieldChoices).toHaveLength(500);
+      expect(
+        (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate)
+          .fieldChoices
+      ).toHaveLength(500);
     });
 
     it("should save data after recording choice", () => {
@@ -124,12 +155,17 @@ describe("UserBehaviorTracker", () => {
   describe("recordAction", () => {
     it("should record action correctly", () => {
       const action = "test_action";
-      const data = { key: "value" };
+      const data: unknown = { key: "value" };
 
       UserBehaviorTracker.recordAction(action, data);
 
-      expect((UserBehaviorTracker as any).actions).toHaveLength(1);
-      const recordedAction = (UserBehaviorTracker as any).actions[0];
+      expect(
+        (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate)
+          .actions
+      ).toHaveLength(1);
+      const recordedAction = (
+        UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate
+      ).actions[0];
       expect(recordedAction.action).toBe(action);
       expect(recordedAction.data).toBe(data);
       expect(recordedAction.timestamp).toBeInstanceOf(Date);
@@ -141,7 +177,10 @@ describe("UserBehaviorTracker", () => {
         UserBehaviorTracker.recordAction(`action${i}`);
       }
 
-      expect((UserBehaviorTracker as any).actions).toHaveLength(1000);
+      expect(
+        (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate)
+          .actions
+      ).toHaveLength(1000);
     });
 
     it("should save data after recording action", () => {
@@ -324,7 +363,9 @@ describe("UserBehaviorTracker", () => {
     it("should calculate average session time", () => {
       // Create actions with specific timestamps
       const now = Date.now();
-      (UserBehaviorTracker as any).actions = [
+      (
+        UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate
+      ).actions = [
         { action: "session_start", timestamp: new Date(now), data: null },
         { action: "other_action", timestamp: new Date(now + 5000), data: null }, // 5 seconds later
         {
@@ -371,8 +412,14 @@ describe("UserBehaviorTracker", () => {
 
       UserBehaviorTracker.clearBehaviorData();
 
-      expect((UserBehaviorTracker as any).actions).toEqual([]);
-      expect((UserBehaviorTracker as any).fieldChoices).toEqual([]);
+      expect(
+        (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate)
+          .actions
+      ).toEqual([]);
+      expect(
+        (UserBehaviorTracker as unknown as UserBehaviorTrackerWithPrivate)
+          .fieldChoices
+      ).toEqual([]);
       expect(localStorageMock.setItem).toHaveBeenCalledTimes(4); // from recordAction, recordFieldChoice, and clearBehaviorData
     });
   });

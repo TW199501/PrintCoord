@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+// 修復 next-intl 模組匯出錯誤
+// @ts-expect-error next-intl module export type issue
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

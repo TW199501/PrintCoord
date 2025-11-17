@@ -129,16 +129,16 @@
   },
   "templates": {
     "stepIndicator": {
-      "reset": "重置",
-      "step": "{number}",
+      "reset": "重置流程",
+      "step": "步驟 {number}",
       "scanning": "掃描中",
       "previous": "上一步",
-      "complete": "完全的",
-      "next": "下一個"
+      "complete": "完成",
+      "next": "下一步"
     },
     "workflowContent": {
       "template": {
-        "descriptionPlaceholder": "輸入範本描述",
+        "descriptionPlaceholder": "輸入模板描述",
         "originalFile": "原始文件"
       },
       "tabs": {

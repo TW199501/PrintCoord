@@ -1,6 +1,8 @@
 packages:
   - src/**
+
 onlyBuiltDependencies:
+  - '@swc/core'
   - canvas
   - sharp
   - tesseract.js

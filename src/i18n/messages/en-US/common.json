@@ -1,7 +1,7 @@
 {
   "brand": "PrintCoord",
   "tagline": "The intelligent form template management system supports PDF/Word form files.",
-  "no-file-selected": "no file selsevt",
+  "no-file-selected": "no file selected",
   "nav": {
     "home": "Home",
     "invoice": "Templates"

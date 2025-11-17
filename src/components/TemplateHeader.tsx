@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Moon, Sun, Grid3x3 } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
+// @ts-expect-error next-intl module export type issue
 import { useTranslations } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 

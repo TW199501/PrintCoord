@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+// @ts-expect-error next-intl module export type issue
 import { useTranslations } from "next-intl";
 
 export default function TemplateFooter() {

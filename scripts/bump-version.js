@@ -5,8 +5,12 @@
  * 每次成功構建後自動增加 patch 版本號 (+0.0.1)
  */
 
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const packageJsonPath = path.join(__dirname, "../package.json");
 

@@ -129,12 +129,12 @@
   },
   "templates": {
     "stepIndicator": {
-      "step": "{number}",
+      "step": "步骤 {number}",
       "scanning": "扫描中",
-      "reset": "重置",
+      "reset": "重置流程",
       "previous": "上一步",
-      "complete": "完全的",
-      "next": "下一个"
+      "complete": "完成",
+      "next": "下一步"
     },
     "workflowContent": {
       "template": {

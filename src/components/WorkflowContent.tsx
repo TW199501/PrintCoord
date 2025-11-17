@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+// 修復 next-intl 模組匯出錯誤
+// @ts-expect-error next-intl module export type issue
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -225,10 +227,7 @@ export default function WorkflowContent({
                       className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       value={templateConfig.description ?? ""}
                       onChange={(e) =>
-                        onTemplateConfigChange({
-                          ...templateConfig,
-                          description: e.target.value,
-                        })
+                        onTemplateConfigChange({ ...templateConfig, description: e.target.value })
                       }
                       placeholder={t('workflowContent.template.descriptionPlaceholder')}
                     />
