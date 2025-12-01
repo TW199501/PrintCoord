@@ -15,14 +15,31 @@ interface Rectangle {
   height: number;
 }
 
+/** 水平 / 垂直線段（不是只有座標，而是有範圍的 segment） */
+interface HSegment {
+  y: number;
+  x1: number;
+  x2: number;
+}
+
+interface VSegment {
+  x: number;
+  y1: number;
+  y2: number;
+}
+
+
 /**
  * 從圖像中檢測四邊框
- * 使用改進的邊緣檢測算法
+ * 步驟：
+ *  1. 用深色像素找出水平 / 垂直「線段」
+ *  2. 依每一個 row band (相鄰水平線之間) 找出在這一帶有覆蓋的垂直線 → 切成格子
+ *  3. 再把同一欄、上下相連且沒有實際水平線切開的格子合併成一大格
  */
 function detectBorderedRectangles(imageData: ImageData): Rectangle[] {
   const { width, height, data } = imageData;
 
-  // 1. 邊緣檢測 - 找出所有深色像素
+  // 1. 邊緣檢測 - 找出所有「深色」像素
   const edges: boolean[][] = [];
   for (let y = 0; y < height; y++) {
     edges[y] = [];
@@ -31,79 +48,230 @@ function detectBorderedRectangles(imageData: ImageData): Rectangle[] {
       const r = data[idx];
       const g = data[idx + 1];
       const b = data[idx + 2];
-      // 判斷是否為深色（邊框）- 降低閾值以檢測更多邊框
-      const isDark = (r + g + b) / 3 < 180;
+      const gray = (r + g + b) / 3;
+      const isDark = gray < 210; // 放鬆一點，格線通常偏灰
       edges[y][x] = isDark;
     }
   }
 
-  // 2. 檢測水平線和垂直線
-  const horizontalLines: number[] = [];
-  const verticalLines: number[] = [];
+  // 2. 掃描出「水平線段」
+  const hSegments: HSegment[] = [];
+  const MIN_H_SEG = Math.max(40, Math.floor(width * 0.25)); // 至少 25% 寬或 40px
 
-  // 檢測水平線（掃描每一行）
   for (let y = 0; y < height; y++) {
-    let darkCount = 0;
-    for (let x = 0; x < width; x++) {
-      if (edges[y][x]) darkCount++;
-    }
-    // 如果這一行有超過 50% 的深色像素，認為是水平線
-    if (darkCount / width > 0.5) {
-      horizontalLines.push(y);
+    let runStart = -1;
+    for (let x = 0; x <= width; x++) {
+      const isDark = x < width ? edges[y][x] : false;
+      if (isDark) {
+        if (runStart === -1) runStart = x;
+      } else if (runStart !== -1) {
+        const runEnd = x - 1;
+        const runLen = runEnd - runStart + 1;
+        if (runLen >= MIN_H_SEG) {
+          hSegments.push({ y, x1: runStart, x2: runEnd });
+        }
+        runStart = -1;
+      }
     }
   }
 
-  // 檢測垂直線（掃描每一列）
+  // 3. 掃描出「垂直線段」
+  const vSegments: VSegment[] = [];
+  const MIN_V_SEG = Math.max(10, Math.floor(height * 0.015)); // 至少 1.5% 高或 10px
+  let maxVRun = 0;
+
   for (let x = 0; x < width; x++) {
-    let darkCount = 0;
-    for (let y = 0; y < height; y++) {
-      if (edges[y][x]) darkCount++;
-    }
-    // 如果這一列有超過 50% 的深色像素，認為是垂直線
-    if (darkCount / height > 0.5) {
-      verticalLines.push(x);
+    let runStart = -1;
+    for (let y = 0; y <= height; y++) {
+      const isDark = y < height ? edges[y][x] : false;
+      if (isDark) {
+        if (runStart === -1) runStart = y;
+      } else if (runStart !== -1) {
+        const runEnd = y - 1;
+        const runLen = runEnd - runStart + 1;
+        if (runLen > maxVRun) maxVRun = runLen;
+        if (runLen >= MIN_V_SEG) {
+          vSegments.push({ x, y1: runStart, y2: runEnd });
+        }
+        runStart = -1;
+      }
     }
   }
 
-  // 3. 合併相近的線條（去除重複）
-  const mergeLines = (lines: number[], threshold: number = 3): number[] => {
-    if (lines.length === 0) return [];
-    const merged = [lines[0]];
-    for (let i = 1; i < lines.length; i++) {
-      if (lines[i] - merged[merged.length - 1] > threshold) {
-        merged.push(lines[i]);
+  if (hSegments.length === 0 || vSegments.length === 0) {
+    console.log("沒有足夠的線段，無法生成矩形欄位");
+    return [];
+  }
+
+  // 4. 將線段的 y / x 座標合併成候選水平線 / 垂直線
+  const mergeCoords = (coords: number[], threshold: number = 3): number[] => {
+    if (coords.length === 0) return [];
+    const sorted = [...coords].sort((a, b) => a - b);
+    const merged = [sorted[0]];
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i] - merged[merged.length - 1] > threshold) {
+        merged.push(sorted[i]);
       }
     }
     return merged;
   };
 
-  const hLines = mergeLines(horizontalLines);
-  const vLines = mergeLines(verticalLines);
+  const hLines = mergeCoords(hSegments.map((s) => s.y));
+  const vLines = mergeCoords(vSegments.map((s) => s.x));
 
-  console.log(`檢測到 ${hLines.length} 條水平線，${vLines.length} 條垂直線`);
+  console.log(
+    `檢測到 ${hLines.length} 條水平線，${vLines.length} 條垂直線（hSeg=${hSegments.length}, vSeg=${vSegments.length}, maxVRun=${maxVRun})`
+  );
 
-  // 4. 根據線條生成矩形（調整邊框位置，讓框更貼合內容）
-  const rectangles: Rectangle[] = [];
-  const borderThickness = 2; // 邊框厚度
+  if (hLines.length < 2 || vLines.length < 2) {
+    console.log("線條太少，無法生成矩形欄位");
+    return [];
+  }
+
+  // 小工具：計算某個垂直 x 在 yBand 之內的覆蓋比例
+  const verticalCoverageRatio = (x: number, y1: number, y2: number): number => {
+    const bandHeight = y2 - y1;
+    if (bandHeight <= 0) return 0;
+
+    const tolX = 1;
+    let covered = 0;
+
+    for (const seg of vSegments) {
+      if (Math.abs(seg.x - x) > tolX) continue;
+      const overlapTop = Math.max(seg.y1, y1);
+      const overlapBottom = Math.min(seg.y2, y2);
+      if (overlapBottom > overlapTop) {
+        covered += overlapBottom - overlapTop;
+      }
+    }
+    return covered / bandHeight;
+  };
+
+  // 小工具：判斷在 x 範圍內，某條 y 是否存在「足夠長」的水平線段（用來阻止垂直合併）
+  const hasStrongHorizontalAt = (
+    y: number,
+    x1: number,
+    x2: number
+  ): boolean => {
+    const tolY = 2;
+    const tolX = 2;
+    const widthBand = x2 - x1;
+    for (const seg of hSegments) {
+      if (Math.abs(seg.y - y) > tolY) continue;
+      const overlapLeft = Math.max(seg.x1, x1 + tolX);
+      const overlapRight = Math.min(seg.x2, x2 - tolX);
+      if (overlapRight > overlapLeft) {
+        const coverRatio = (overlapRight - overlapLeft) / widthBand;
+        if (coverRatio >= 0.7) return true;
+      }
+    }
+    return false;
+  };
+
+  // 5. 先在每個 row band 中，用「有效垂直線」切出初始格子
+  const rawRects: Rectangle[] = [];
+  const borderInsetX = 2;  // 只在 X 方向縮進，Y 不縮
 
   for (let i = 0; i < hLines.length - 1; i++) {
-    for (let j = 0; j < vLines.length - 1; j++) {
-      // 調整位置，跳過邊框線本身
-      const x = vLines[j] + borderThickness;
-      const y = hLines[i] + borderThickness;
-      const width = vLines[j + 1] - vLines[j] - borderThickness * 2;
-      const height = hLines[i + 1] - hLines[i] - borderThickness * 2;
+    const yTop = hLines[i];
+    const yBottom = hLines[i + 1];
+    const bandHeight = yBottom - yTop;
+    if (bandHeight <= 8) continue;
 
-      // 過濾太小的矩形
-      if (width > 20 && height > 20) {
-        rectangles.push({ x, y, width, height });
+    // 這個 band 內有哪些垂直線「覆蓋比例 >= 80%」→ 才算是這一帶的有效分隔線
+    const activeXs: number[] = [];
+    for (const x of vLines) {
+      const ratio = verticalCoverageRatio(x, yTop, yBottom);
+      if (ratio >= 0.8) {
+        activeXs.push(x);
       }
+    }
+    if (activeXs.length < 2) continue;
+
+    activeXs.sort((a, b) => a - b);
+
+    for (let j = 0; j < activeXs.length - 1; j++) {
+      const xLeft = activeXs[j];
+      const xRight = activeXs[j + 1];
+      const w = xRight - xLeft - borderInsetX * 2;
+      const h = bandHeight; // Y 方向不縮進，避免上下有縫
+
+      if (w <= 8 || h <= 8) continue;
+
+      rawRects.push({
+        x: xLeft + borderInsetX,
+        y: yTop,
+        width: w,
+        height: h,
+      });
     }
   }
 
-  console.log(`生成 ${rectangles.length} 個矩形欄位`);
-  return rectangles;
+  console.log(`初始切出 ${rawRects.length} 個格子（尚未合併）`);
+
+  if (rawRects.length === 0) return [];
+
+  // 6. 把同一欄、上下相鄰且中間「沒有實際水平線」的格子合併成一大格
+  const rects = [...rawRects].sort((a, b) => a.x - b.x || a.y - b.y);
+  const used = new Array(rects.length).fill(false);
+  const merged: Rectangle[] = [];
+  const xTol = 2;
+  const widthTol = 2;
+  const yTol = 6; // 提高一點容忍度，確保可以合併
+
+  for (let i = 0; i < rects.length; i++) {
+    if (used[i]) continue;
+    let cur = { ...rects[i] };
+
+    while (true) {
+      let mergedAny = false;
+      for (let j = 0; j < rects.length; j++) {
+        if (used[j] || j === i) continue;
+        const r = rects[j];
+
+        const sameCol =
+          Math.abs(r.x - cur.x) <= xTol &&
+          Math.abs(r.width - cur.width) <= widthTol;
+        const directlyBelow =
+          Math.abs(r.y - (cur.y + cur.height)) <= yTol;
+
+        if (!sameCol || !directlyBelow) continue;
+
+        // 如果中間有「實際水平線」橫跨這整欄，就不要合併
+        const boundaryY = cur.y + cur.height;
+        const x1 = cur.x;
+        const x2 = cur.x + cur.width;
+        if (hasStrongHorizontalAt(boundaryY, x1, x2)) {
+          continue;
+        }
+
+        // 合併
+        const bottom = Math.max(
+          cur.y + cur.height,
+          r.y + r.height
+        );
+        cur = {
+          x: cur.x,
+          y: cur.y,
+          width: cur.width,
+          height: bottom - cur.y,
+        };
+        used[j] = true;
+        mergedAny = true;
+      }
+      if (!mergedAny) break;
+    }
+
+    used[i] = true;
+    merged.push(cur);
+  }
+
+  console.log(`合併後剩 ${merged.length} 個矩形欄位`);
+  return merged;
 }
+
+
+
 
 export class FieldDetectionService {
   /**
@@ -140,8 +308,8 @@ export class FieldDetectionService {
     const rectangles = detectBorderedRectangles(imageData);
 
     // 計算縮放比例
-    const scaleX = targetWidth ? targetWidth / imageElement.width : 1;
-    const scaleY = targetHeight ? targetHeight / imageElement.height : 1;
+    const scaleX = 1;
+    const scaleY = 1;
 
     console.log(`原始圖片尺寸: ${imageElement.width} × ${imageElement.height}`);
     console.log(`目標顯示尺寸: ${targetWidth} × ${targetHeight}`);
