@@ -434,7 +434,57 @@ export default function TemplateManager() {
 
       if (detectedFields.length > 0) {
         console.log(`✅ 使用四邊框檢測，找到 ${detectedFields.length} 個欄位`);
-        finalFields = sortFieldsByRowAndX(detectedFields);
+        let ordered = sortFieldsByRowAndX(detectedFields);
+
+        // 從 PDF 提取文字並配對
+        if (uploadResult.file) {
+          console.log('正在從 PDF 提取文字...');
+          const { PDFTextExtractor } = await import('./services/pdfTextExtractor');
+          const words = await PDFTextExtractor.extractTextFromPDF(
+            uploadResult.file,
+            1,
+            workingCanvas.width,
+            workingCanvas.height
+          );
+          console.log('PDF 文字提取完成，文字數量:', words.length);
+
+          // 配對框內文字
+          ordered = ordered.map((field, idx) => {
+            const fx = field.position.x;
+            const fy = field.position.y;
+            const fw = field.size.width;
+            const fh = field.size.height;
+
+            // 找出起始點在框內的文字
+            const textsInBox = words
+              .filter(w => {
+                const wx = w.bbox[0];
+                const wy = w.bbox[1];
+                return wx >= fx && wx <= fx + fw && wy >= fy && wy <= fy + fh;
+              })
+              .map(w => w.text.trim())
+              .filter(Boolean);
+
+            if (textsInBox.length > 0) {
+              const fullText = textsInBox.join(' ');
+              console.log(`[欄位 ${idx + 1}] 框內文字: "${fullText}"`);
+              return {
+                ...field,
+                labelZh: fullText,
+                name: fullText || `field_${idx + 1}`
+              };
+            } else {
+              console.log(`[欄位 ${idx + 1}] 無文字`);
+              return {
+                ...field,
+                labelZh: `欄位 ${idx + 1}`,
+                name: `field_${idx + 1}`
+              };
+            }
+          });
+        }
+
+        finalFields = ordered;
       }
 
       // 2) 如果四邊框檢測沒有結果，嘗試後端 pdf2json
