@@ -21,11 +21,11 @@ import { OCRService } from "@/services/ocrService";
 type WorkflowStep = "upload" | "edit" | "preview";
 
 const STEP_COPY: Record<WorkflowStep, { title: string; description: string }> =
-  {
-    upload: { title: "上傳文件", description: "先上傳表格文件並確認資訊" },
-    edit: { title: "編輯欄位", description: "在畫布上調整欄位位置" },
-    preview: { title: "預覽與保存", description: "確認欄位資訊並保存模板" },
-  };
+{
+  upload: { title: "上傳文件", description: "先上傳表格文件並確認資訊" },
+  edit: { title: "編輯欄位", description: "在畫布上調整欄位位置" },
+  preview: { title: "預覽與保存", description: "確認欄位資訊並保存模板" },
+};
 
 const LANGUAGES = [
   { value: "zh-TW", label: "繁體中文" },
@@ -419,28 +419,74 @@ export default function TemplateManager() {
 
       // 1) 優先使用新的四邊框檢測（更準確）
       let finalFields: FieldArea[] = [];
-      
+
       // 先嘗試使用新的圖像檢測方法（檢測四邊框）
       const imageEl = new Image();
       imageEl.src = workingCanvas.toDataURL();
       await new Promise((resolve) => {
         imageEl.onload = resolve;
       });
-      
+
       // 傳入目標顯示尺寸（A4 標準尺寸）來計算縮放比例
-      const targetWidth = 794;  // A4 寬度
-      const targetHeight = 1123; // A4 高度
       const detectedFields = await FieldDetectionService.detectFieldsFromImage(
-        imageEl,
-        targetWidth,
-        targetHeight
+        imageEl
       );
-      
+
       if (detectedFields.length > 0) {
         console.log(`✅ 使用四邊框檢測，找到 ${detectedFields.length} 個欄位`);
-        finalFields = sortFieldsByRowAndX(detectedFields);
+        let ordered = sortFieldsByRowAndX(detectedFields);
+
+        // 從 PDF 提取文字並配對
+        if (uploadResult.file) {
+          console.log('正在從 PDF 提取文字...');
+          const { PDFTextExtractor } = await import('./services/pdfTextExtractor');
+          const words = await PDFTextExtractor.extractTextFromPDF(
+            uploadResult.file,
+            1,
+            workingCanvas.width,
+            workingCanvas.height
+          );
+          console.log('PDF 文字提取完成，文字數量:', words.length);
+
+          // 配對框內文字
+          ordered = ordered.map((field, idx) => {
+            const fx = field.position.x;
+            const fy = field.position.y;
+            const fw = field.size.width;
+            const fh = field.size.height;
+
+            // 找出起始點在框內的文字
+            const textsInBox = words
+              .filter(w => {
+                const wx = w.bbox[0];
+                const wy = w.bbox[1];
+                return wx >= fx && wx <= fx + fw && wy >= fy && wy <= fy + fh;
+              })
+              .map(w => w.text.trim())
+              .filter(Boolean);
+
+            if (textsInBox.length > 0) {
+              const fullText = textsInBox.join(' ');
+              console.log(`[欄位 ${idx + 1}] 框內文字: "${fullText}"`);
+              return {
+                ...field,
+                labelZh: fullText,
+                name: fullText || `field_${idx + 1}`
+              };
+            } else {
+              console.log(`[欄位 ${idx + 1}] 無文字`);
+              return {
+                ...field,
+                labelZh: `欄位 ${idx + 1}`,
+                name: `field_${idx + 1}`
+              };
+            }
+          });
+        }
+
+        finalFields = ordered;
       }
-      
+
       // 2) 如果四邊框檢測沒有結果，嘗試後端 pdf2json
       if (finalFields.length === 0 && uploadResult.file) {
         try {
@@ -465,11 +511,11 @@ export default function TemplateManager() {
                 ...f,
                 name: f.name
                   ? f.name
-                      .normalize("NFKC")
-                      .replace(/[^A-Za-z0-9]+/g, "_")
-                      .replace(/_{2,}/g, "_")
-                      .replace(/^_+|_+$/g, "")
-                      .toLowerCase() || `field_${i + 1}`
+                    .normalize("NFKC")
+                    .replace(/[^A-Za-z0-9]+/g, "_")
+                    .replace(/_{2,}/g, "_")
+                    .replace(/^_+|_+$/g, "")
+                    .toLowerCase() || `field_${i + 1}`
                   : `field_${i + 1}`,
               }));
             }

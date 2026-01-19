@@ -14,6 +14,15 @@ interface TemplateEditorProps {
   onCanvasReady?: (canvas: fabric.Canvas) => void;
 }
 
+// 用來記錄背景圖在 Canvas 上的變換
+interface ImageTransform {
+  scale: number;
+  offsetX: number;
+  offsetY: number;
+  imgWidth: number;
+  imgHeight: number;
+}
+
 export default function TemplateEditor({
   canvasData,
   fields,
@@ -25,10 +34,11 @@ export default function TemplateEditor({
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasImage, setHasImage] = useState(false);
 
+  // 背景圖縮放與位移資訊
+  const [imageTransform, setImageTransform] = useState<ImageTransform | null>(null);
+
   const handlePrint = useCallback(() => {
-    if (!canvasRef.current) {
-      return;
-    }
+    if (!canvasRef.current) return;
 
     const dataUrl = canvasRef.current.toDataURL("image/png");
 
@@ -90,14 +100,17 @@ export default function TemplateEditor({
     </body></html>`;
   }, []);
 
-  // 初始化 Canvas
+  // 初始化 Canvas + 背景圖片
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    // 初始化時使用標準 A4 尺寸（21cm × 29.7cm @ 96 DPI）
+    // A4 尺寸（21cm × 29.7cm @ 96 DPI）
+    const canvasWidth = 794;
+    const canvasHeight = 1123;
+
     const canvas = new fabric.Canvas(canvasRef.current, {
-      width: 794,
-      height: 1123,
+      width: canvasWidth,
+      height: canvasHeight,
       backgroundColor: "#f8f9fa",
     });
 
@@ -106,64 +119,109 @@ export default function TemplateEditor({
     // 載入背景圖片
     if (canvasData) {
       try {
-        // 使用圖片元素創建背景
         const imgElement = new Image();
-        imgElement.crossOrigin = 'anonymous';
+        imgElement.crossOrigin = "anonymous";
         imgElement.onload = () => {
           const currentCanvas = fabricCanvasRef.current;
           if (!currentCanvas) return;
-          
-          // 標準 A4 尺寸（21cm × 29.7cm @ 96 DPI）
-          const canvasWidth = 794;   // 21cm
-          const canvasHeight = 1123; // 29.7cm
-          
-          // 調整 Canvas 尺寸
+
+          // 設定 Canvas 尺寸（仍採用固定 A4）
           currentCanvas.setDimensions({
             width: canvasWidth,
-            height: canvasHeight
+            height: canvasHeight,
           });
-          
-          // 設置有影像狀態
+
           setHasImage(true);
-          
-          // 創建 Fabric.js 圖片物件
+
           const fabricImg = new fabric.Image(imgElement);
-          
-          // 計算縮放比例，讓圖片填滿整個 Canvas（使用 max 而非 min）
+
+          // 計算縮放比例，讓圖片填滿整個 Canvas（你原本是用 max）
           const scaleX = canvasWidth / imgElement.width;
           const scaleY = canvasHeight / imgElement.height;
-          const scale = Math.max(scaleX, scaleY); // 使用 max 讓圖片填滿
-          
-          // 圖片縮放並置中
+          const scale = Math.max(scaleX, scaleY);
+
+          const left = (canvasWidth - imgElement.width * scale) / 2;
+          const top = (canvasHeight - imgElement.height * scale) / 2;
+
           fabricImg.set({
             scaleX: scale,
             scaleY: scale,
-            originX: 'left',
-            originY: 'top',
-            left: (canvasWidth - imgElement.width * scale) / 2,
-            top: (canvasHeight - imgElement.height * scale) / 2
+            originX: "left",
+            originY: "top",
+            left,
+            top,
           });
-          
-          // 使用 Fabric.js 6.x 的方式設置背景圖片
+
+          // 存下背景圖的 transform，之後畫欄位要用同一套
+          setImageTransform({
+            scale,
+            offsetX: left,
+            offsetY: top,
+            imgWidth: imgElement.width,
+            imgHeight: imgElement.height,
+          });
+
           currentCanvas.backgroundImage = fabricImg;
           currentCanvas.renderAll();
         };
         imgElement.onerror = () => {
-          console.warn('無法載入背景圖片: 圖片載入失敗');
+          console.warn("無法載入背景圖片: 圖片載入失敗");
         };
         imgElement.src = canvasData;
       } catch (error) {
-        console.warn('無法載入背景圖片:', error);
+        console.warn("無法載入背景圖片:", error);
       }
     }
 
-    // 載入現有欄位
+    if (onCanvasReady) {
+      onCanvasReady(canvas);
+    }
+
+    return () => {
+      canvas.dispose();
+    };
+  }, [canvasData, onCanvasReady]);
+
+  // 畫出 fields（藍色框）── 套用跟背景圖一樣的 scale / offset
+  useEffect(() => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas || !imageTransform) return;
+
+    const { scale, offsetX, offsetY } = imageTransform;
+
+    // 先清掉舊的欄位（保留背景圖）
+    const objects = canvas.getObjects();
+    objects.forEach((obj) => {
+      const objWithData = obj as fabric.FabricObject & { data?: FieldArea };
+      // 這裡假設背景圖是 backgroundImage，不在 objects list 裡
+      if (
+        objWithData.data ||
+        obj.type === "rect" ||
+        obj.type === "text"
+      ) {
+        canvas.remove(obj);
+      }
+    });
+
+    // 重新把所有欄位畫上去
     fields.forEach((field) => {
+      // 原始座標（偵測時用的，是以原圖片尺寸為基準）
+      const baseX = field.position.x;
+      const baseY = field.position.y;
+      const baseW = field.size.width;
+      const baseH = field.size.height;
+
+      // 轉成 Canvas 上的實際位置
+      const x = offsetX + baseX * scale;
+      const y = offsetY + baseY * scale;
+      const w = baseW * scale;
+      const h = baseH * scale;
+
       const rect = new fabric.Rect({
-        left: field.position.x,
-        top: field.position.y,
-        width: field.size.width,
-        height: field.size.height,
+        left: x,
+        top: y,
+        width: w,
+        height: h,
         fill: "rgba(59, 130, 246, 0.2)",
         stroke: "#3b82f6",
         strokeWidth: 2,
@@ -173,10 +231,9 @@ export default function TemplateEditor({
         data: field,
       });
 
-      // 添加文字標籤
-      const text = new fabric.Text(field.name, {
-        left: field.position.x + 5,
-        top: field.position.y + 5,
+      const text = new fabric.Text(field.labelZh || field.name, {
+        left: x + 5,
+        top: y + 5,
         fontSize: 12,
         fill: "#3b82f6",
         selectable: false,
@@ -186,18 +243,10 @@ export default function TemplateEditor({
       canvas.add(text);
     });
 
-    // 選擇事件（欄位編輯現在在右側 DraggableFieldList 中處理）
+    canvas.renderAll();
+  }, [fields, imageTransform]);
 
-    if (onCanvasReady) {
-      onCanvasReady(canvas);
-    }
-
-    return () => {
-      canvas.dispose();
-    };
-  }, [canvasData, fields, onCanvasReady]);
-
-  // 添加新欄位
+  // 添加新欄位（這段先保留原本邏輯，之後如果要跟偵測共用座標系再加 inverse transform）
   const addField = useCallback(() => {
     if (!fabricCanvasRef.current) return;
 
@@ -251,12 +300,20 @@ export default function TemplateEditor({
       canvas.off("mouse:move", handleMouseMove);
       canvas.off("mouse:up", handleMouseUp);
 
-      // 創建新欄位
+      const left = rect.left || 0;
+      const top = rect.top || 0;
+      const width = rect.width || 100;
+      const height = rect.height || 30;
+
+      // 如果之後想讓「手動畫出來的欄位」也回到原始圖片座標，
+      // 可以在這裡用 imageTransform 做反向換算：
+      // baseX = (left - offsetX) / scale; baseY = (top - offsetY) / scale; ...
+
       const newField: FieldArea = {
         id: `field_${Date.now()}`,
         name: `欄位 ${fields.length + 1}`,
-        position: { x: rect.left || 0, y: rect.top || 0 },
-        size: { width: rect.width || 100, height: rect.height || 30 },
+        position: { x: left, y: top },
+        size: { width, height },
         fieldType: FieldType.TEXT,
       };
 
@@ -270,57 +327,10 @@ export default function TemplateEditor({
     canvas.on("mouse:down", handleMouseDown);
     canvas.on("mouse:move", handleMouseMove);
     canvas.on("mouse:up", handleMouseUp);
-  }, []);
-
-  // 監聽 fields 變化，同步更新 Canvas 上的藍色框
-  useEffect(() => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-
-    // 清除所有欄位物件（保留背景圖）
-    const objects = canvas.getObjects();
-    objects.forEach((obj) => {
-      const objWithData = obj as fabric.FabricObject & { data?: FieldArea };
-      if (objWithData.data || obj.type === 'rect' || obj.type === 'text') {
-        canvas.remove(obj);
-      }
-    });
-
-    // 重新繪製所有欄位
-    fields.forEach((field) => {
-      const rect = new fabric.Rect({
-        left: field.position.x,
-        top: field.position.y,
-        width: field.size.width,
-        height: field.size.height,
-        fill: "rgba(59, 130, 246, 0.2)",
-        stroke: "#3b82f6",
-        strokeWidth: 2,
-        selectable: true,
-        hasControls: true,
-        lockRotation: true,
-        data: field,
-      });
-
-      const text = new fabric.Text(field.labelZh || field.name, {
-        left: field.position.x + 5,
-        top: field.position.y + 5,
-        fontSize: 12,
-        fill: "#3b82f6",
-        selectable: false,
-      });
-
-      canvas.add(rect);
-      canvas.add(text);
-    });
-
-    canvas.renderAll();
-  }, [fields]);
-
-  // 欄位編輯功能已移至 DraggableFieldList 組件
+  }, [fields, onFieldsChange]);
 
   return (
-    <Card className="overflow-hidden" style={{ width: 'fit-content', marginTop: '1px' }}>
+    <Card className="overflow-hidden" style={{ width: "fit-content", marginTop: "1px" }}>
       <CardHeader className="py-3">
         <CardTitle className="flex items-center justify-between text-base">
           <div className="flex items-center gap-2">
@@ -338,11 +348,11 @@ export default function TemplateEditor({
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div 
-          className="overflow-auto" 
-          style={{ 
-            height: hasImage ? 'fit-content' : '400px',
-            maxHeight: hasImage ? 'none' : '400px'
+        <div
+          className="overflow-auto"
+          style={{
+            height: hasImage ? "fit-content" : "400px",
+            maxHeight: hasImage ? "none" : "400px",
           }}
         >
           <EditorWithRuler width={794} height={1123} showGrid={true} unit="cm">
@@ -354,7 +364,9 @@ export default function TemplateEditor({
           </EditorWithRuler>
         </div>
         {isDrawing && (
-          <p className="text-sm text-blue-600 mt-2 px-6">拖拽鼠標繪製欄位區域</p>
+          <p className="text-sm text-blue-600 mt-2 px-6">
+            拖拽鼠標繪製欄位區域
+          </p>
         )}
       </CardContent>
     </Card>
